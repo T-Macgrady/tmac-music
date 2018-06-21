@@ -134,7 +134,7 @@
         this.$refs.addSong.show()
       }
     },
-    // 歌曲切换成功 执行ScrollToCurrent
+    // 歌曲切换成功,执行ScrollToCurrent
     watch: {
       currentSong(newSong, oldSong) {
         if (!this.showFlag || newSong.id === oldSong.id) {
