@@ -9,51 +9,55 @@
 
 - [上线demo >>](http://47.106.183.192:8888/#/singer)
 - 扫码体验：（若微信扫描请点下方访问原网页）
+
 ![TmacMusic](https://raw.githubusercontent.com/T-Macgrady/imgs/master/others/TmacMusic.png)
+
 - 图片演示：
+
 ![singer](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/singer.jpg)
+
 ![player](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/player.jpg)
 
 ## 技术栈
 
 ### 技术
 
-|  技术   |    Vue.js（2.x） |Vuex |Vue Router | ES6|  stylus |git |webpack 2.0 | yarn|vue-cli|
+|  item   |   MVVM框架 | 状态管理  | 前端路由  | js新标准|   css 预编译 |版本管理 |构建工具 | 包管理|脚手架|
 | :---: | :---------:| :------: |:------: |:------: |:------: |:------: |:------: |:------: |:------: |
-|  功能   |   MVVM框架 | 状态管理  | 前端路由  | js新标准|   css 预编译 |版本管理 |构建工具 | 包管理|脚手架|
+|  技术   |    Vue.js（2.x） |Vuex |Vue Router | ES6|  stylus |git |webpack 2.0 | yarn|vue-cli|
 
 ### 其他技术&工具
 
 * Jsonp
- - 跨域来请求数据
+	*  跨域来请求数据
 * vue-axios
- - 数据请求 通讯
+	*  数据请求 通讯
 * Node.js
- - 利用Express搭建代理服务器，转发本地请求返回数据实现跨域
- -  项目编译打包后搭建本地测试服务器，回归测试
+	*  利用Express搭建代理服务器，转发本地请求返回数据实现跨域
+ 	*  项目编译打包后搭建本地测试服务器，回归测试
 * vue-router
- - 结合 Vue 的异步组件和 Webpack 的代码分割功能，实现路由组件的懒加载以优化性能，加快首屏加载
+	*  结合 Vue 的异步组件和 Webpack 的代码分割功能，实现路由组件的懒加载以优化性能，加快首屏加载
 * [vue-lazyload](https://github.com/T-Macgrady/vue-lazyload)
- - 实现图片懒加载，节省用户流量，优化页面加载速度
+	*  实现图片懒加载，节省用户流量，优化页面加载速度
 * [`better-scroll`](https://github.com/T-Macgrady/better-scroll)
- - 移动端滚动插件，使移动端滑动体验更加流畅
+	*  移动端滚动插件，使移动端滑动体验更加流畅
 * shell
- - 编写自动化发布脚本
+	*  编写自动化发布脚本
 * nginx
- - 项目部署上线反向代理
+	*  项目部署上线反向代理
 * fastclick
- - 解决移动端300ms延迟
+	*   解决移动端300ms延迟
 * charles
- - 移动端抓包，查看数据收发
- - 代理转发，部署上线前使用map local代理本地文件 map remote代理接口进行回归测试，防止代码压缩后网页显示效果不一致
+	*  移动端抓包，查看数据收发
+	*  代理转发，部署上线前使用map local代理本地文件 map remote代理接口进行回归测试，防止代码压缩后网页显示效果不一致
 * [`lyric-parser`](https://github.com/ustbhuangyi/lyric-parser)
- - 歌词解析
+	*  歌词解析
 * [`Js-Base64`](https://github.com/T-Macgrady/js-base64)
  - Base64编码与解码
 * [`iconfont`](http://www.iconfont.cn/) 
- - 图标库
+	*   图标库
 * [`good-storage`](https://github.com/T-Macgrady/storage) 
- - 直接从storage存取数据，无需转换
+	*  直接从storage存取数据，无需转换
 ## 项目运行
 
 ### Clone项目
