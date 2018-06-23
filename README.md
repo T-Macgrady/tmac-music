@@ -14,9 +14,7 @@
 
 - 图片演示：
 
-![singer](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/singer.jpg)
-
-![player](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/player.jpg)
+![singer](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/singer.jpg)![player](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/player.jpg)
 
 ## 技术栈
 
