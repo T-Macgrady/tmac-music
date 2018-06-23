@@ -53,14 +53,14 @@ var webpackConfig = merge(baseWebpackConfig, {
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: process.env.NODE_ENV === 'testing' ?
-        'index.html' :
-        config.build.index,
+        'index.html' : config.build.index,
       template: 'index.html',
       inject: true,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
-        removeAttributeQuotes: true
+        removeAttributeQuotes: true,
+        favicon: '/favicon.ico'
         // more options:
         // https://github.com/kangax/html-minifier#options-quick-reference
       },
