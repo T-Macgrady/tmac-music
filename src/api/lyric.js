@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { commonParams } from './config'
+import {
+  commonParams
+} from './config'
 
 export function getLyric(mid) {
   const url = '/api/lyric'
