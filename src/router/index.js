@@ -3,11 +3,7 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-const Recommend = resolve => {
-  import('views/recommend').then(module => {
-    resolve(module)
-  })
-}
+import Recommend from 'views/recommend'
 
 const Singer = resolve => {
   import('views/singer').then(module => {
