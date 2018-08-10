@@ -1,6 +1,6 @@
 <template>
   <div class="loading">
-    <img width="64" height="64" src="./Spinner.gif" alt="">
+    <img width="64" height="64" src="./loading.gif">
     <p class="desc">{{title}}</p>
   </div>
 </template>
@@ -24,4 +24,3 @@
       font-size $font-size-small
       color: $color-text-l
 </style>
- 

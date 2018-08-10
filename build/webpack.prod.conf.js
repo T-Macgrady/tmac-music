@@ -56,11 +56,11 @@ var webpackConfig = merge(baseWebpackConfig, {
         'index.html' : config.build.index,
       template: 'index.html',
       inject: true,
+      favicon: './favicon.ico',
       minify: {
         removeComments: true,
         collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        favicon: '/favicon.ico'
+        removeAttributeQuotes: true
         // more options:
         // https://github.com/kangax/html-minifier#options-quick-reference
       },
