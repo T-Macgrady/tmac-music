@@ -18,7 +18,7 @@
           :refreshDelay="refreshDelay"
         >
           <transition-group tag="ul" name="list">
-            <li 
+            <li
               class="item"
               v-for="(item, index) in sequenceList"
               :key="item.id"
@@ -52,7 +52,7 @@
         ref="confirm" 
         confirmBtnText="清空"
       >
-        </confirm>
+      </confirm>
       <add-song ref="addSong"></add-song>
     </div>
   </transition>

@@ -165,7 +165,6 @@
       },
       // 计算每一个singer list的height
       calcHeight() {
-        this.listHeight = []
         const list = this.$refs.listGroup
         let height = 0
         this.listHeight.push(height)

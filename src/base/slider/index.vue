@@ -33,15 +33,13 @@
       }
     },
     mounted() {
-      setTimeout(() => {
-        this._setSliderWidth()
-        this._initDots()
-        this._initSlider()
+      this._setSliderWidth()
+      this._initDots()
+      this._initSlider()
 
-        if (this.autoPlay) {
-          this._play()
-        }
-      }, 20)
+      if (this.autoPlay) {
+        this._play()
+      }
       window.addEventListener('resize', () => {
         if (!this.slider) return
         // 窗口改变的大小时重新计算clienWidth 此时不需要再加上两个多余的width
@@ -55,10 +53,14 @@
       }
     },
     deactivated() {
-      clearTimeout(this.timer)
+      if (this.autoPlay) {
+        clearTimeout(this.timer)
+      }
     },
     beforeDestroy() {
-      clearTimeout(this.timer)
+      if (this.autoPlay) {
+        clearTimeout(this.timer)
+      }
     },
     methods: {
       _setSliderWidth(isResize) {
@@ -123,7 +125,9 @@
       }
     },
     destroyed() {
-      clearTimeout(this.timer)
+      if (this.autoPlay) {
+        clearTimeout(this.timer)
+      }
     }
   }
 </script>

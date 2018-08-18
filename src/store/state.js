@@ -4,7 +4,7 @@ const state = {
   // 歌手信息 Object{ id name avatar }
   singer: {},
   // 播放状态 Boolean
-  playing: false,
+  playing: true,
   // 播放器全屏 Boolean
   fullScreen: false,
   // 当前歌曲播放列表 Array

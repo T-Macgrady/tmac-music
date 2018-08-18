@@ -22,6 +22,10 @@
       percent: {
         type: Number,
         default: 0
+      },
+      audioError: {
+        type: Boolean,
+        default: false
       }
     },
     watch: {
@@ -39,6 +43,7 @@
     methods: {
       // 进度条拖动效果
       progressTouchStart(e) {
+        if (this.audioError) return
         this.touch.initiated = true
         this.touch.startX = e.touches[0].pageX
         // 当前移动的位置
@@ -67,6 +72,7 @@
         this.$emit('percentChange', percent)
       },
       progressClick(e) {
+        if (this.audioError) return
         const rect = this.$refs.progressBar.getBoundingClientRect()
         const offsetWidth = e.pageX - rect.left
         this._offset(offsetWidth)
