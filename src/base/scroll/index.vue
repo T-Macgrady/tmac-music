@@ -16,7 +16,7 @@
         default: true
       },
       data: {
-        type: Array,
+        type: [Array, Boolean],
         default: null
       },
       listenScroll: {

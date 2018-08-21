@@ -26,8 +26,8 @@
     >
       <div class="song-list-wrapper">
         <song-list 
-          :songs="songs" 
-          :rank="rank" 
+          :songs="songs"
+          :rank="rank"
           @select="selectItem"
         >
         </song-list>
@@ -80,6 +80,11 @@
       // 加载歌手背景图片
       bgStyle() {
         return `background-image:url(${this.bgImage})`
+      },
+      songsUrlReady() {
+        // debugger
+        const length = this.songs.length
+        return !!length && !!(this.songs[0].url)
       }
     },
     created() {
@@ -105,16 +110,47 @@
       back() {
         this.$router.back()
       },
+      // selectItem(item, index) {
+      //   // debugger
+      //   console.log(this.$watch)
+      //   if (this.songsUrlReady) {
+      //     this.selectPlay({
+      //       list: this.songs,
+      //       index
+      //     })
+      //   } else {
+      //     this.$watch(function () {
+      //       return this.songsUrlReady
+      //     }, function () {
+      //       this.selectPlay({
+      //         list: this.songs,
+      //         index
+      //       })
+      //     })
+      //   }
+      // },
       selectItem(item, index) {
-        this.selectPlay({
+        this.setWatcher('songsUrlReady', 'selectPlay', {
           list: this.songs,
           index
-        })
+        }, index)
       },
       random() {
-        this.randomPlay({
+        this.setWatcher('songsUrlReady', 'randomPlay', {
           list: this.songs
         })
+      },
+      setWatcher(data, method, ...rest) {
+        if (this[data]) {
+          this[method].apply(null, rest)
+        } else {
+          this.unwatch = this.$watch(function () {
+            return this[data]
+          }, function () {
+            this[method].apply(null, rest)
+            this.unwatch()
+          })
+        }
       },
       ...mapActions([
         'selectPlay',

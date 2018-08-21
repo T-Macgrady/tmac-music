@@ -167,7 +167,8 @@
         opacity: 1,
         offsetWidth: null,
         audioError: false,
-        errorTip: ''
+        errorTip: '',
+        useDisCls: false
       }
     },
     components: {
@@ -206,7 +207,7 @@
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
       },
       disableCls() {
-        return this.songReady ? '' : 'disable'
+        return this.useDisCls ? (this.songReady ? '' : 'disable') : ''
       },
       disableCenCls() {
         return (this.songReady && !this.audioError) ? '' : 'disable'
@@ -242,19 +243,19 @@
         this.musicEnd && (this.musicEnd = false)
 
         // 防止歌词切换跳动
-        if (this.currentLyric) {
-          this.currentLyric.stop()
-          this.playingLyric = ''
-        }
+        this.currentLyric && this.currentLyric.stop()
 
-        if (this.timer) {
-          clearTimeout(this.timer)
-        }
+        this.getLyric()
+        this.timer && clearTimeout(this.timer)
         this.timer = setTimeout(() => {
-          this.$refs.audio.play().catch(e => {
-            !this.errorTip
+          this.$refs.audio.play().then(() => {
+            console.log('play.then')
+            this.currentLyric && this.currentLyric.play()
+            this.savePlayHistory(this.currentSong)
           })
-          this.getLyric()
+          .catch(e => {
+            !this.audioError && this.handleError(e)
+          })
         }, 500)
       },
       playing(newPlaying) {
@@ -275,25 +276,43 @@
         }
         const currentTime = this.currentSong.duration * percent
         this.$refs.audio.currentTime = currentTime
-        if (!this.playing) {
-          this.togglePlaying()
-        }
+        !this.playing && this.togglePlaying()
         // 点击或滑动 歌曲进度条 歌词滚动到对应的位置
-        if (this.currentLyric) {
-          this.currentLyric.seek(currentTime * 1000)
+        this.currentLyric && this.currentLyric.seek(currentTime * 1000)
+      },
+      handleError(e) {
+        console.log('ev:' + e)
+        this.songReady = true
+        this.audioError = true
+        this.currentLyric && this.clearLyric()
+        if (this.currentShow === 'lyric') {
+          this.time = 300
+          this.opacity = 1
+          this.offsetWidth = 0
+          this.currentShow === 'lyric'
         }
+        // 弹出error-tip
+        this.errorTip = '播放源受限TnT,请切换歌曲'
       },
       updateTime(e) {
         const time = this.currentSong.duration - 10
         this.currentTime = e.target.currentTime
-        if (this.currentTime >= time) {
+        if (this.currentTime > time) {
           if (this.musicEnd) return
-          this.changeVolume('end', 0.2, 0.2)
+          this.changeVolume('end', 0.2, 0.1)
           this.musicEnd = true
+          // this.single('musicEnd', this.changeVolume, 'end', 0.2, 0.2)
         }
       },
-      // oneRun(name, fn) {
-      // }
+      // single(sign, fn, ...rest) {
+      //   if (typeof sign === 'string') {
+      //     !this[sign] && (this[sign] = fn.apply(this, rest))
+      //   } else if (Array.isArray(sign)) {
+      //     const mark = this[fn].name
+      //     return this[mark] ? this[mark] : fn.apply(this, rest)
+      //   }
+      //   return false
+      // },
       // 格式化时间
       format(interval) {
         interval = interval | 0
@@ -314,17 +333,14 @@
         if (this.audioError) return
         this.currentSong.getLyric().then(lyric => {
           this.currentLyric = new Lyric(lyric, this.handleLyric)
-          if (this.playing) {
-            console.log('lyc play')
-            this.currentLyric.play()
-          }
+          this.songReady && this.currentLyric.state === 0 && this.currentLyric.play()
+          this.audioError && this.clearLyric()
         }).catch(() => {
           this.currentLyric = null
           this.currentLineNum = 0
           this.playingLyric = ''
         })
       },
-
       handleLyric({lineNum, txt}) {
         this.currentLineNum = lineNum
         if (lineNum > 5) {
@@ -334,6 +350,12 @@
           this.$refs.lyriclist.scrollTo(0, 0, 1000)
         }
         this.playingLyric = txt
+      },
+      clearLyric() {
+        this.currentLyric.stop()
+        this.currentLyric = null
+        this.currentLineNum = 0
+        this.playingLyric = ''
       },
       loadstart() {
         console.log('loadstart')
@@ -354,11 +376,12 @@
       ready() {
         console.log('ready')
         this.songReady = true
-        this.savePlayHistory(this.currentSong)
+        if (this.currentTime && this.currentTime > this.startEnd) return
         this.changeVolume('start')
       },
       changeVolume(type, delta = 0.2, floor = 0, limit = 1, time = 1) {
         let duration = time * 1000
+        this.startEnd = time * Math.floor((limit - 0.2) / delta)
         let audio = this.$refs.audio
         if (this.interval) {
           clearInterval(this.interval)
@@ -375,7 +398,6 @@
           if (vol < floor || vol > limit) {
             clearInterval(this.interval)
             this.interval = null
-            console.log('this.interval:' + this.interval)
             return
           }
           console.log('setvolume')
@@ -390,23 +412,9 @@
       },
       error(e) {
         console.log('ev:' + e)
-        this.songReady = true
-        this.audioError = true
-        // 清除歌词
-        if (this.currentLyric) {
-          this.currentLyric.stop()
-          this.currentLyric = null
-          this.currentLineNum = 0
-          this.playingLyric = ''
-        }
-        if (this.currentShow === 'lyric') {
-          this.time = 300
-          this.opacity = 1
-          this.offsetWidth = 0
-          this.currentShow === 'lyric'
-        }
+        this.handleError()
         // 根据error-code弹出tip
-        let errorCode = e.target.error.code
+        /* let errorCode = e.target.error.code
         switch (errorCode) {
           case 1:
             this.errorTip = '请求被中止,请重试或切换歌曲'
@@ -418,11 +426,11 @@
             this.errorTip = '解码错误,请重试或切换歌曲'
             break
           case 4:
-            this.errorTip = '播放源被受限TnT,请切换歌曲'
+            this.errorTip = '播放源受限TnT,请切换歌曲'
             break
           default:
             this.errorTip = '出错了TnT,请重试或切换歌曲'
-        }
+        } */
       },
       // 歌曲前进后退
       prev() {
@@ -433,15 +441,11 @@
           this.loop()
         } else {
           let index = this.currentIndex - 1
-          if (index === -1) {
-            index = this.playList.length - 1
-          }
+          index === -1 && (index = this.playList.length - 1)
           this.setCurrentIndex(index)
-          if (!this.playing) {
-            this.togglePlaying()
-          }
+          !this.playing && this.togglePlaying()
         }
-        // this.songReady = false
+        this.songReady = false
       },
       next() {
         if (!this.songReady) {
@@ -452,15 +456,11 @@
           this.loop()
         } else {
           let index = this.currentIndex + 1
-          if (index === this.playList.length) {
-            index = 0
-          }
+          index === this.playList.length && (index = 0)
           this.setCurrentIndex(index)
-          if (!this.playing) {
-            this.togglePlaying()
-          }
+          !this.playing && this.togglePlaying()
         }
-        // this.songReady = false
+        this.songReady = false
       },
       ended() {
         if (this.mode === playMode.loop) {
@@ -474,9 +474,7 @@
         this.$refs.audio.play()
 
         // 循环播放 歌词回到开始的时候
-        if (this.currentLyric) {
-          this.currentLyric.seek(0)
-        }
+        this.currentLyric && this.currentLyric.seek(0)
       },
       back() {
         this.setFullScreen(false)
@@ -492,9 +490,7 @@
         this.setPlayingState(!this.playing)
 
         // 歌词随着歌曲播放暂停而滚动或暂停滚动
-        if (this.currentLyric) {
-          this.currentLyric.togglePlay()
-        }
+        this.currentLyric && this.currentLyric.togglePlay()
       },
 
       // 歌词&CD滑动切换
@@ -518,9 +514,7 @@
         if (Math.abs(deltaY) > Math.abs(deltaX)) {
           return
         }
-        if (!this.touch.moved) {
-          this.touch.moved = true
-        }
+        !this.touch.moved && (this.touch.moved = true)
         const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
         this.time = 0
         // 滚动的距离  最大是0

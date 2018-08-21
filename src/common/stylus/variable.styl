@@ -1,17 +1,47 @@
-// 颜色定义规范
-$color-background = #222
-$color-background-d = rgba(0, 0, 0, 0.3)
-$color-highlight-background = #333
-$color-dialog-background = #666
-$color-theme = #ffcd32
-$color-theme-d = rgba(255, 205, 49, 0.5)
-$color-sub-theme = #d93f30
+// hash = (default default-style) (red red-style) (white white-style)
+
+// $STYLE = default
+
+//for pair in hash
+//  if pair[0] == $STYLE
+//    pair[1]()
+
+
+// 酷黑 - deault
+BG_CR = #222
+BG_CR_OP = rgba(0, 0, 0, 0.3)
+TT_CR = #fff
+
+// 媚红
+BG_CR = #B45B3E
+BG_CR_OP = rgba(153, 58, 28, 0.5)
+
+// 海洋绿
+BG_CR = #2E8B57
+BG_CR_OP = rgba(0, 0, 0, 0.3)
+
+// 深岩暗蓝灰色
+BG_CR = #483D8B
+BG_CR_OP = rgba(221, 221,221 , 0.3)
+
+// 背景颜色
+$color-background = BG_CR
+$color-background-d = BG_CR_OP
+$color-highlight-background = lighten(BG_CR, 10%)
+$color-dialog-background = lighten(BG_CR, 20%)
+
+// 字体颜色
 $color-text = #fff
-$color-text-d = rgba(255, 255, 255, 0.3)
+$color-text-d = rgba(255, 255, 255, 0.4)
 $color-text-l = rgba(255, 255, 255, 0.5)
 $color-text-ll = rgba(255, 255, 255, 0.8)
 
-//字体定义规范
+// 高亮字体颜色
+$color-theme = #ffcd32
+$color-theme-d = rgba(255, 205, 50, 0.5)
+$color-sub-theme = #d93f30
+
+//字体大小
 $font-size-small-s = 10px
 $font-size-small = 12px
 $font-size-medium = 14px

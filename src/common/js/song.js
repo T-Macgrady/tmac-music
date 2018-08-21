@@ -1,4 +1,5 @@
 import { getLyric } from 'api/lyric'
+import getPurlUrl from 'api/getPurlUrl'
 import { ERR_OK } from 'api/config'
 import { Base64 } from 'js-base64'
 
@@ -41,10 +42,36 @@ export function createSong(musicData) {
     album: musicData.albumname,
     duration: musicData.interval,
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    // 歌源url
-    // url: `http://thirdparty.gtimg.com/C100${musicData.songmid}.m4a?fromtag=38`
-    url: `http://dl.stream.qqmusic.qq.com/C400${musicData.songmid}/${musicData.songid}.m4a?guid=263427534&fromtag=66`
+    url: ''
   })
+}
+
+export function createSongs(list, type, vm) {
+  let songMidList = []
+  let songType = []
+  let songs = []
+  // debugger
+  list.forEach((item) => {
+    let musicData = null
+    type === 'singer' ? ({musicData} = item) : (musicData = type === 'rank' && item.data || item)
+    musicData.songtype = musicData.songtype || 0
+    musicData.songid && musicData.albummid && musicData.songmid &&
+    songMidList.push(musicData.songmid) && songType.push(musicData.songtype) &&
+    songs.push(createSong(musicData))
+  })
+  // debugger
+  getPurlUrl(songMidList, songType).then((res) => {
+    // debugger
+    res.forEach((item, i) => {
+      // debugger
+      vm.songs[i]['url'] = item.purl ? item.purl : 'no support resourse'
+    })
+    // vm.songs[i]['url'] = item.purl
+  }).catch(e => {
+    console.log(e)
+  })
+  // debugger
+  vm.songs = songs
 }
 
 function filterSinger(singer) {

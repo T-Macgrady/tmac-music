@@ -8,7 +8,7 @@
   import { mapGetters } from 'vuex'
   import { getTopListDetail } from 'api/rank'
   import { ERR_OK } from 'api/config'
-  import { createSong } from 'common/js/song'
+  import { createSongs } from 'common/js/song'
 
   export default {
     data() {
@@ -43,21 +43,12 @@
           this.$router.push('/rank')
           return
         }
+        let that = this
         getTopListDetail(this.topList.id).then(res => {
           if (res.code === ERR_OK) {
-            this.songs = this._normalizeList(res.songlist)
+            createSongs(res.songlist, 'rank', that)
           }
         })
-      },
-      _normalizeList(list) {
-        let ret = []
-        list.forEach((item) => {
-          const musicData = item.data
-          if (musicData.songid && musicData.albummid) {
-            ret.push(createSong(musicData))
-          }
-        })
-        return ret
       }
     }
   }
