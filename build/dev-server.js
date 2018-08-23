@@ -50,6 +50,21 @@ apiRoutes.get('/getDiscList', function(req, res) {
     console.log(error)
   })
 })
+
+app.get('/soso/fcgi-bin/search_for_qq_cp', function(req, res) {
+  var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+  axios.get(url, {
+    headers: {
+      referer: 'https://c.y.qq.com/',
+      host: 'c.y.qq.com'
+    }
+  }).then((response) => {
+    res.json(response.data)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+
 apiRoutes.get('/lyric', function(req, res) {
   var url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
   console.log('lyric')

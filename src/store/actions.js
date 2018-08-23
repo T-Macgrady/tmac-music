@@ -1,7 +1,7 @@
 import * as types from './mutation-types'
 import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/util'
-import { saveSearch, deleteSearch, clearSearch, savePlay, saveFavorite, deleteFavorite } from 'common/js/cache'
+import { saveSearch, deleteSearch, clearSearch, savePlay, saveFavorite, deleteFavorite, saveTheme } from 'common/js/cache'
 
 function findIndex(list, song) {
   return list.findIndex((item) => {
@@ -149,4 +149,9 @@ export const saveFavoriteList = function({ commit }, song) {
 
 export const deleteFavoriteList = function({ commit }, song) {
   commit(types.SET_FAVORITE_LIST, deleteFavorite(song))
+}
+
+// 切换皮肤主题
+export const setTheme = function({commit}, theme) {
+  commit(types.SET_THEME, saveTheme(theme))
 }

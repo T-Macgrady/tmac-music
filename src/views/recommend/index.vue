@@ -102,8 +102,6 @@
 </script>
 
 <style scoped lang="stylus">
-  @import "~common/stylus/variable"
-
   .recommend
     position: fixed
     width: 100%

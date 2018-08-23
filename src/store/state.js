@@ -1,5 +1,5 @@
 import { playMode } from 'common/js/config'
-import { loadSearch, loadPlay, loadFavorite } from 'common/js/cache'
+import { loadSearch, loadPlay, loadFavorite, loadTheme } from 'common/js/cache'
 const state = {
   // 歌手信息 Object{ id name avatar }
   singer: {},
@@ -24,7 +24,9 @@ const state = {
   // 播放历史 Array
   playHistory: loadPlay(),
   // 用户中心
-  favoriteList: loadFavorite()
+  favoriteList: loadFavorite(),
+  // 主题设置
+  theme: loadTheme() || 'black'
 }
 
 export default state

@@ -9,6 +9,8 @@ const PLAY_MAX_LEN = 200
 const FAVORITE_KEY = '__favorite__'
 const FAVORITE_MAX_LEN = 200
 
+const THEME_KEY = '__THEME__'
+
 function insertArray(arr, val, compare, maxLen) {
   const index = arr.findIndex(compare)
   if (index === 0) {
@@ -90,4 +92,13 @@ export function deleteFavorite(song) {
 
 export function loadFavorite() {
   return storage.get(FAVORITE_KEY, [])
+}
+
+export function saveTheme(theme) {
+  storage.set(THEME_KEY, theme)
+  return theme
+}
+
+export function loadTheme() {
+  return storage.get(THEME_KEY, '')
 }

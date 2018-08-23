@@ -1,5 +1,5 @@
 <template>
-  <div class="music-list">
+  <div class="music-list" :class="theme">
     <!--返回上一层-->
     <div class="back" @click="back">
       <i class="icon-back"></i>
@@ -15,13 +15,14 @@
       </div>
     </div>
     <!--滑动辅助层-->
-    <div class="bg-layer" ref="layer"></div>
+    <div class="bg-layer" :class="theme" ref="layer"></div>
     <!--歌曲列表-->
     <scroll :data="songs" 
       @scroll="scroll"
       :listen-scroll="listenScroll" 
       :probe-type="probeType" 
       class="list" 
+      :class="theme"
       ref="list"
     >
       <div class="song-list-wrapper">
@@ -193,9 +194,6 @@
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
-
   .music-list
     position: fixed
     z-index: 100
@@ -203,7 +201,7 @@
     left: 0
     bottom: 0
     right: 0
-    background: $color-background
+    extend-styles('background', $color-background)
     .back
       position absolute
       top: 0
@@ -266,13 +264,13 @@
     .bg-layer
       position: relative
       height: 100%
-      background: $color-background
+      extend-styles(background, $color-background)
     .list
       position: fixed
       top: 0
       bottom: 0
       width: 100%
-      background: $color-background
+      extend-styles(background, $color-background)
       .song-list-wrapper
         padding: 20px 30px
       .loading-container

@@ -1,7 +1,7 @@
 <template>
   <transition name="list-fade">
-    <div class="playlist" v-show="showFlag" @click="hide">
-      <div class="list-wrapper" @click.stop>
+    <div class="playlist" :class="theme" v-show="showFlag" @click="hide">
+      <div class="list-wrapper" :class="theme" @click.stop>
         <div class="list-header">
           <h1 class="title">
             <i class="icon" :class="iconMode" @click="changeMode"></i>
@@ -42,7 +42,7 @@
             <span class="text">添加歌曲到队列</span>
           </div>
         </div>
-        <div class="list-close" @click="hide()">
+        <div class="list-close" :class="theme" @click="hide()">
           <span>关闭</span>
         </div>
       </div>
@@ -148,9 +148,6 @@
   }
 </script>
 <style scoped lang="stylus">
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
-
   .playlist
     position: fixed
     left: 0
@@ -158,7 +155,7 @@
     top: 0
     bottom: 0
     z-index: 200
-    background-color: $color-background-d
+    extend-styles(background-color, $color-background-d)
     &.list-fade-enter-active, &.list-fade-leave-active
       transition: opacity 0.3s
       .list-wrapper
@@ -173,7 +170,7 @@
       left: 0
       bottom: 0
       width: 100%
-      background-color: $color-highlight-background
+      extend-styles(background, $color-highlight-background)
       .list-header
         position: relative
         padding: 20px 30px 10px 20px
@@ -245,7 +242,7 @@
       .list-close
         text-align: center
         line-height: 50px
-        background: $color-background
+        extend-styles(background, $color-background)
         font-size: $font-size-medium-x
         color: $color-text-l
 </style>

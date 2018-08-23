@@ -15,7 +15,6 @@
   }
 </script>
 <style lang="stylus" scoped>
-  @import "~common/stylus/variable"
   .loading
     width: 100%
     text-align: center

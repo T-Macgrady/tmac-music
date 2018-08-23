@@ -1,6 +1,6 @@
 <template>
   <transition name="slide">
-    <div class="add-song" v-show="showFlag" @click.stop>
+    <div class="add-song" :class="theme" v-show="showFlag" @click.stop>
       <div class="header">
         <h1 class="title">添加歌曲到列表</h1>
         <div class="close" @click="hide">
@@ -147,16 +147,13 @@
   }
 </script>
 <style lang="stylus" scoped>
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
-
   .add-song
     position: fixed
     top: 0
     bottom: 0
     width: 100%
     z-index: 200
-    background: $color-background
+    extend-styles(background, $color-background)
     &.slide-enter-active, &.slide-leave-active
       transition: all 0.3s
     &.slide-enter, &.slide-leave-to

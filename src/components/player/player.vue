@@ -8,7 +8,7 @@
         @after-leave="afterLeave"
       >
         <!--播放页面全屏-->
-        <div class="normal-player" v-show="fullScreen">
+        <div class="normal-player" :class="theme" v-show="fullScreen">
           <!--背景 模糊-->
           <div class="background">
             <img :src="currentSong.image" alt="" width="100%" height="100%">
@@ -101,7 +101,7 @@
       </transition>
       <!--播放页面小屏 底部-->
       <transition name="mini">
-        <div class="mini-player" v-show="!fullScreen" @click="open">
+        <div class="mini-player" :class="theme" v-show="!fullScreen" @click="open">
           <div class="icon">
             <img alt="" :src="currentSong.image" width="40" height="40" :class="cdCls">
           </div>
@@ -439,6 +439,7 @@
         }
         if (this.playList.length === 1) {
           this.loop()
+          return
         } else {
           let index = this.currentIndex - 1
           index === -1 && (index = this.playList.length - 1)
@@ -454,6 +455,7 @@
         // 列表只有一首歌曲则单曲循环
         if (this.playList.length === 1) {
           this.loop()
+          return
         } else {
           let index = this.currentIndex + 1
           index === this.playList.length && (index = 0)
@@ -523,6 +525,7 @@
         this.opacity = 1 - this.touch.percent
       },
       middleTouchEnd() {
+        console.log('--------------middleTouchEnd------------------------')
         if (!this.touch.moved) {
           return
         }
@@ -646,12 +649,9 @@
   }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
-
   .player
     &.appear-enter-active
-      transition: all 1s
+      transition: all 0.5s
     &.appear-enter
       opacity: 0
     .normal-player
@@ -661,7 +661,7 @@
       top: 0
       bottom: 0
       z-index: 150
-      background: $color-background
+      extend-styles(background, $color-background)
       .background
         position: absolute
         left: 0
@@ -847,7 +847,7 @@
       z-index: 180
       width: 100%
       height: 60px
-      background: $color-highlight-background
+      extend-styles(background, $color-highlight-background)
       &.mini-enter-active, &.mini-leave-active
         transition: all 0.4s
       &.mini-enter, &.mini-leave-to

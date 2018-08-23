@@ -1,3 +1,5 @@
+@import "./mixin.styl"
+
 // hash = (default default-style) (red red-style) (white white-style)
 
 // $STYLE = default
@@ -7,28 +9,7 @@
 //    pair[1]()
 
 
-// 酷黑 - deault
-BG_CR = #222
-BG_CR_OP = rgba(0, 0, 0, 0.3)
-TT_CR = #fff
-
-// 媚红
-BG_CR = #B45B3E
-BG_CR_OP = rgba(153, 58, 28, 0.5)
-
-// 海洋绿
-BG_CR = #2E8B57
-BG_CR_OP = rgba(0, 0, 0, 0.3)
-
-// 深岩暗蓝灰色
-BG_CR = #483D8B
-BG_CR_OP = rgba(221, 221,221 , 0.3)
-
-// 背景颜色
-$color-background = BG_CR
-$color-background-d = BG_CR_OP
-$color-highlight-background = lighten(BG_CR, 10%)
-$color-dialog-background = lighten(BG_CR, 20%)
+// --------------无需切换的样式--------------
 
 // 字体颜色
 $color-text = #fff
@@ -48,3 +29,56 @@ $font-size-medium = 14px
 $font-size-medium-x = 16px
 $font-size-large = 18px
 $font-size-large-x = 22px
+
+// ----------------背景颜色参数----------------
+
+// 酷黑 - deault
+BG_CR_BLACK = #222
+BG_CR_OP_BLACK = rgba(0, 0, 0, 0.3)
+
+// 媚红
+BG_CR_ERD = #B45B3E
+BG_CR_OP_ERD  = rgba(153, 58, 28, 0.5)
+
+// 海洋绿
+BG_CR_GREEN  = #2E8B57
+BG_CR_OP_GREEN = rgba(0, 0, 0, 0.3)
+
+// 深岩暗蓝灰色
+BG_CR_BLUE = #483D8B
+BG_CR_OP_BLUE = rgba(221, 221,221 , 0.3)
+
+// ----------------切换背景颜色----------------
+// --------------------酷黑--------------------styLus
+
+$color-background-black = BG_CR_BLACK
+$color-background-d-black = BG_CR_OP_BLACK
+$color-highlight-background-black = lighten(BG_CR_BLACK, 10%)
+$color-dialog-background-black = lighten(BG_CR_BLACK, 20%)
+
+// --------------------媚红--------------------
+
+$color-background-red = BG_CR_ERD
+$color-background-d-red = BG_CR_OP_ERD
+$color-highlight-background-red = lighten(BG_CR_ERD, 10%)
+$color-dialog-background-red = lighten(BG_CR_ERD, 20%)
+
+// -------------------海洋绿-------------------
+
+$color-background-green = BG_CR_GREEN
+$color-background-d-green = BG_CR_OP_GREEN
+$color-highlight-background-green = lighten(BG_CR_GREEN, 10%)
+$color-dialog-background-green = lighten(BG_CR_GREEN, 20%)
+
+// -----------------深岩暗蓝灰------------------
+
+$color-background-blue = BG_CR_BLUE
+$color-background-d-blue = BG_CR_OP_BLUE
+$color-highlight-background-blue = lighten(BG_CR_BLUE, 10%)
+$color-dialog-background-blue = lighten(BG_CR_BLUE, 20%)
+
+// 背景颜色mixin参数
+$color-background=$color-background-black $color-background-red $color-background-blue $color-background-green
+$color-background-d =$color-background-d-black $color-background-d-red $color-background-d-blue $color-background-d-green
+$color-highlight-background =$color-highlight-background-black $color-highlight-background-red $color-highlight-background-blue $color-highlight-background-green
+$color-dialog-background =$color-dialog-background-black $color-dialog-background-red $color-dialog-background-blue $color-dialog-background-green
