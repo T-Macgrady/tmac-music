@@ -29,65 +29,59 @@
       }
     },
     computed: {
+      // 下一个皮肤样式class
       nextTheme() {
-        // debugger
         const themes = ['black', 'blue', 'red', 'green']
         return themes[this.i]
       }
     },
     created() {
+      // 根据localstorage初始化i
       const themes = ['black', 'blue', 'red', 'green']
       let len = themes.length
-      // debugger
       while (len--) {
         if (themes[len] === this.theme) {
-          // debugger
           this.i = len
           break
         }
       }
+
       this.touch = {}
+      // 根据vuex初始化body皮肤样式class
       this.body = this.$root.$el.parentElement
       this.setClass(this.body, this.theme)
+      // 监听自定义的换肤事件，在moveend判断是否触发
       this.$on('switch', this.switchTheme.bind(this))
     },
     methods: {
       switchStart(e) {
-        // debugger
-        console.log('switchStart')
+        // 初始化tuoch的start move状态
         this.touch.initiated = true
-        this.touch.move = false
+        this.touch.moved = false
+
         const touch = e.touches[0]
         this.touch.startX = touch.screenX
         this.touch.startY = touch.screenY
       },
       switchMove(e) {
-        console.log('switchMove')
-        console.log(this.touch.initiated)
-        // debugger
+        // 未初始化则返回
         if (!this.touch.initiated) return
-        console.log('switchMove--【有switchstart】')
-        console.log(this.touch.initiated)
+
         const touch = e.touches[0]
         this.touch.deltaX = touch.screenX - this.touch.startX
         const deltaY = touch.screenY - this.touch.startY
-        const absX = Math.abs(this.touch.deltaX)
-        const absY = Math.abs(deltaY)
-        if (absX < absY) return
-        !this.touch.move && (this.touch.move = true)
-        console.log('switchMove--【this.touch.moved = true】')
+        // 不是水平滑动则返回
+        if (Math.abs(this.touch.deltaX) < Math.abs(deltaY)) return
+
+        !this.touch.moved && (this.touch.moved = true)
         const width = window.innerWidth
-        this.touch.percent = absX / width
-        console.log('this.touch.deltaX:' + this.touch.deltaX + '\n' + 'this.deltaY:' + deltaY + '\n' + 'this.touch.percent:' + this.touch.percent)
+        this.touch.percent = Math.abs(this.touch.deltaX / width)
       },
       switchEnd(e) {
-        console.log('switchEnd')
-        // debugger
-        console.log('this.touch.move:' + this.touch.move + '\n' + 'this.touch.percent:' + this.touch.percent)
-        if (!this.touch.move || this.touch.percent < 0.5) return
-        console.log('switchEnd--【可以切换】')
+        // 未初始化/不是水平滑动/滑动未超过半屏返回
+        if (!this.touch.moved || this.touch.percent < 0.5) return
+
         let i = this.i
-        // debugger
         this.touch.deltaX > 0 ? i++ : i--
         if (i > 3) {
           this.i = 0
@@ -96,20 +90,16 @@
         } else {
           this.i = i
         }
-        console.log('this.i:' + this.i + ' this.nextTheme:' + this.nextTheme)
-        this.touch.initiated = false
-        this.touch.move = false
-        console.log('this.touch.move:' + this.touch.move)
+        // 触发换肤事件并去除int/move标记
         this.$emit('switch', this.nextTheme)
+        this.touch.initiated = false
+        this.touch.moved = false
       },
       switchTheme(theme) {
-        console.log('switch')
         this.setClass(this.body, theme)
-        // debugger
         this.setTheme(theme)
       },
       setClass(el, classNmae) {
-        // debugger
         el.className = classNmae
       },
       ...mapActions(['setTheme'])

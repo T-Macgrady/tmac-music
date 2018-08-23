@@ -68,7 +68,7 @@
               </span>
               <!--播放进度条-->
               <div class="progress-bar-wrapper">
-                <progress-bar :percent="percent" :audioError="audioError" @percentChange="onProgressBarChange"></progress-bar>
+                <progress-bar :percent="percent" :audioError="audioError" :songReady="songReady" @percentChange="onProgressBarChange"></progress-bar>
               </div>
               <span class="time time-r">
                 {{format(currentSong.duration)}}
@@ -128,7 +128,7 @@
         @canplay="canplay" 
         @canplaythrough="canplaythrough" 
         @loadeddata="loadeddata" 
-        @play="ready" 
+        @play="play" 
         @waiting="waiting" 
         @playing="startPlay" 
         @error="error"
@@ -146,7 +146,7 @@
   import animations from 'create-keyframe-animation'
   import ProgressCircle from 'base/progressCircle/progressCircle'
   import { playMode } from 'common/js/config'
-  import Lyric from 'lyric-parser'
+  import Lyric from 'common/js/lyric-parse'
   import Scroll from 'base/scroll'
   import PlayList from 'base/playList/playList'
   import { playerMixin } from 'common/js/mixin'
@@ -156,7 +156,8 @@
     mixins: [playerMixin],
     data() {
       return {
-        songReady: true,
+        songReady: false,
+        // playReady: false,
         currentTime: 0,
         radius: 32,
         currentLyric: null,
@@ -168,7 +169,7 @@
         offsetWidth: null,
         audioError: false,
         errorTip: '',
-        useDisCls: false
+        useDisCls: true
       }
     },
     components: {
@@ -177,11 +178,9 @@
       Scroll,
       PlayList
     },
-    // 滑动touch
     created() {
       this.touch = {}
     },
-    // 填充歌曲信息 控制歌曲播放
     computed: {
       // 计算CD&歌词切换touchEnd后的动画样式
       moveStyle() {
@@ -197,6 +196,7 @@
         } : {}
       },
 
+      // 跟踪播放状态切换图标样式
       cdCls() {
         return this.playing ? 'play' : 'pause'
       },
@@ -225,40 +225,25 @@
       ])
     },
     watch: {
-      currentSong(newSong, oldSong) {
-        // 当列表没有歌曲时 直接return
-        if (!newSong.id) return
-
-        if (newSong === oldSong) {
-          return
-        }
-        if (this.audioError) {
-          this.audioError = false
-          this.errorTip = ''
-        }
-        if (this.interval) {
-          clearInterval(this.interval)
-          this.interval = null
-        }
-        this.musicEnd && (this.musicEnd = false)
-
-        // 防止歌词切换跳动
-        this.currentLyric && this.currentLyric.stop()
-
-        this.getLyric()
-        this.timer && clearTimeout(this.timer)
-        this.timer = setTimeout(() => {
-          this.$refs.audio.play().then(() => {
-            console.log('play.then')
-            this.currentLyric && this.currentLyric.play()
-            this.savePlayHistory(this.currentSong)
+      // 切换歌曲时处理
+      currentSong(t, e) {
+        // 列表没有歌曲/重复时 return
+        if (t.id && t.url && t.id !== e.id) {
+          // if (this.switch === true) {
+          //   this.handleSwitch()
+          //   this.switch === false
+          // }
+          this.handleSwitch()
+          this.getLyric()
+          // debugger
+          this.$nextTick(() => {
+            // this.$refs.audio.src = t.url
+            this.$refs.audio.play()
           })
-          .catch(e => {
-            !this.audioError && this.handleError(e)
-          })
-        }, 500)
+        }
       },
       playing(newPlaying) {
+        // debugger
         const audio = this.$refs.audio
         this.$nextTick(() => {
           newPlaying ? audio.play() : audio.pause()
@@ -292,7 +277,7 @@
           this.currentShow === 'lyric'
         }
         // 弹出error-tip
-        this.errorTip = '播放源受限TnT,请切换歌曲'
+        this.errorTip = '网络异常或播放源受限TnT,请切换歌曲'
       },
       updateTime(e) {
         const time = this.currentSong.duration - 10
@@ -332,16 +317,40 @@
       getLyric() {
         if (this.audioError) return
         this.currentSong.getLyric().then(lyric => {
+          // debugger
           this.currentLyric = new Lyric(lyric, this.handleLyric)
-          this.songReady && this.currentLyric.state === 0 && this.currentLyric.play()
-          this.audioError && this.clearLyric()
+          // this.songReady && this.currentLyric.state === 0 && this.currentLyric.play()
+          // this.currentLyric && this.currentLyric.play()
+          // debugger
+          this.setWatcher('songReady', 'lyricPlay')
+          // this.audioError && this.currentLyric && this.clearLyric()
         }).catch(() => {
-          this.currentLyric = null
-          this.currentLineNum = 0
-          this.playingLyric = ''
+          this.clearLyric()
         })
       },
-      handleLyric({lineNum, txt}) {
+      lyricPlay() {
+        const currentTime = this.currentTime * 1000
+        console.log(this.songReady + '---' + currentTime)
+        // debugger
+        // this.currentLyric && this.currentLyric.play() && this.currentLyric.seek(10000)
+        this.currentLyric && this.currentLyric.play(currentTime)
+      },
+      setWatcher(data, method, ...rest) {
+        if (this[data]) {
+          this[method].apply(null, rest)
+        } else {
+          this.unwatch = this.$watch(function () {
+            return this[data]
+          }, function (newValue, oldValue) {
+            // if (newValue === oldValue) return
+            this[method].apply(null, rest)
+            this.unwatch()
+          })
+        }
+      },
+      handleLyric({lineNum, txt, lyric}) {
+        // debugger
+        if (lyric !== this.currentLyric) return
         this.currentLineNum = lineNum
         if (lineNum > 5) {
           let lineEl = this.$refs.lyricLine[lineNum - 5]
@@ -365,19 +374,58 @@
       },
       seeking() {
         console.log('seeking')
+        this.currentLyric.stop()
       },
       canplay() {
         console.log('canplay')
+        if (this.songReady) {
+          this.lyricPlay()
+        }
       },
       canplaythrough() {
         console.log('canplaythrough')
       },
       // 防止快速点击 产生错误
-      ready() {
-        console.log('ready')
-        this.songReady = true
-        if (this.currentTime && this.currentTime > this.startEnd) return
-        this.changeVolume('start')
+      play() {
+        console.log('play')
+        // this.songReady = true
+        // if (this.currentTime && this.currentTime > this.startEnd) return
+        // this.changeVolume('start')
+      },
+      waiting() {
+        console.log('waiting')
+      },
+      startPlay() {
+        console.log('playing')
+        if (!this.songReady) {
+          this.songReady = true
+          this.savePlayHistory(this.currentSong)
+          this.errorTip && (this.errorTip = '')
+          // if (this.currentTime && this.currentTime > this.startEnd) return
+          this.changeVolume('start')
+        }
+      },
+      error(e) {
+        console.log('ev:' + e)
+        this.handleError()
+        // 根据error-code弹出tip
+        /* let errorCode = e.target.error.code
+        switch (errorCode) {
+          case 1:
+            this.errorTip = '请求被中止,请重试或切换歌曲'
+            break
+          case 2:
+            this.errorTip = '下载错误,请重试或切换歌曲'
+            break
+          case 3:
+            this.errorTip = '解码错误,请重试或切换歌曲'
+            break
+          case 4:
+            this.errorTip = '播放源受限TnT,请切换歌曲'
+            break
+          default:
+            this.errorTip = '出错了TnT,请重试或切换歌曲'
+        } */
       },
       changeVolume(type, delta = 0.2, floor = 0, limit = 1, time = 1) {
         let duration = time * 1000
@@ -404,36 +452,9 @@
           audio.volume = vol
         }, duration)
       },
-      waiting() {
-        console.log('waiting')
-      },
-      startPlay() {
-        console.log('playing')
-      },
-      error(e) {
-        console.log('ev:' + e)
-        this.handleError()
-        // 根据error-code弹出tip
-        /* let errorCode = e.target.error.code
-        switch (errorCode) {
-          case 1:
-            this.errorTip = '请求被中止,请重试或切换歌曲'
-            break
-          case 2:
-            this.errorTip = '下载错误,请重试或切换歌曲'
-            break
-          case 3:
-            this.errorTip = '解码错误,请重试或切换歌曲'
-            break
-          case 4:
-            this.errorTip = '播放源受限TnT,请切换歌曲'
-            break
-          default:
-            this.errorTip = '出错了TnT,请重试或切换歌曲'
-        } */
-      },
       // 歌曲前进后退
-      prev() {
+      prev(e) {
+        // debugger
         if (!this.songReady) {
           return
         }
@@ -446,7 +467,7 @@
           this.setCurrentIndex(index)
           !this.playing && this.togglePlaying()
         }
-        this.songReady = false
+        // this.songReady = false
       },
       next() {
         if (!this.songReady) {
@@ -462,7 +483,26 @@
           this.setCurrentIndex(index)
           !this.playing && this.togglePlaying()
         }
-        this.songReady = false
+        // this.songReady = false
+      },
+      handleSwitch() {
+        // 重置audioError/errorTip
+        if (this.audioError) {
+          this.audioError = false
+          this.errorTip = ''
+        }
+        // 清除音量变化的interval/尾部标记
+        if (this.interval) {
+          clearInterval(this.interval)
+          this.interval = null
+        }
+        this.musicEnd && (this.musicEnd = false)
+
+        this.songReady && (this.songReady = false)
+        this.watch && this.unwatch && this.unwatch()
+        // 防止歌词切换跳动
+        // this.currentLyric && this.currentLyric.stop() && clearTimeout(this.currentLyric.timer)
+        this.currentLyric && clearTimeout(this.currentLyric.timer) && this.clearLyric()
       },
       ended() {
         if (this.mode === playMode.loop) {
