@@ -1,12 +1,12 @@
 <template>
-  <transition name="confirm-fade">
-    <div class="confirm" v-show="showFlag" @click.stop>
+  <transition name="confirm-fade" :class="theme">
+    <div class="confirm" :class="theme" v-show="showFlag" @click.stop>
       <div class="confirm-wrapper">
-        <div class="confirm-content">
+        <div class="confirm-content" :class="theme">
           <p class="text">{{text}}</p>
           <div class="operate">
-            <div @click="cancel" class="operate-btn left">{{cancelBtnText}}</div>
-            <div @click="confirm" class="operate-btn">{{confirmBtnText}}</div>
+            <div @click="cancel" class="operate-btn left" :class="theme">{{cancelBtnText}}</div>
+            <div @click="confirm" class="operate-btn" :class="theme">{{confirmBtnText}}</div>
           </div>
         </div>
       </div>
@@ -55,8 +55,6 @@
 </script>
 
 <style scoped lang="stylus">
-  @import "~common/stylus/variable"
-
   .confirm
     position: fixed
     left: 0
@@ -64,7 +62,7 @@
     top: 0
     bottom: 0
     z-index: 998
-    background-color: $color-background-d
+    extend-styles(background-color, $color-background-d)
     &.confirm-fade-enter-active
       animation: confirm-fadein 0.3s
       .confirm-content
@@ -78,7 +76,7 @@
       .confirm-content
         width: 270px
         border-radius: 13px
-        background: $color-highlight-background
+        extend-styles(background, $color-highlight-background)
         .text
           padding: 19px 15px
           line-height: 22px
@@ -94,10 +92,11 @@
             flex: 1
             line-height: 22px
             padding: 10px 0
-            border-top: 1px solid $color-background-d
+            extend-styles(border-top, $color-background-d, 1px, solid)
             color: $color-text-d
             &.left
-              border-right: 1px solid $color-background-d
+              extend-styles(border-right, $color-background-d, 1px, solid)
+              
 
   @keyframes confirm-fadein
     0%

@@ -83,8 +83,6 @@
 </script>
 
 <style scoped lang="stylus">
-  @import "~common/stylus/variable"
-
   .progress-bar
     height: 30px
     .bar-inner

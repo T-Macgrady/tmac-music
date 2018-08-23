@@ -1,5 +1,6 @@
 <template>
   <scroll class="list-view" 
+    :class="theme" 
     :data="data" 
     ref="listView"
     :listenScroll="listenScroll"
@@ -8,7 +9,7 @@
   >
     <ul>
       <li v-for="group in data" class="list-group" :key="group.key" ref="listGroup">
-        <h2 class="list-group-title"> {{group.title}} </h2>
+        <h2 class="list-group-title" :class="theme"> {{group.title}} </h2>
         <ul>
           <li @click="selectItem(item)" class="list-group-item" v-for="item in group.items" :key="item.key">
             <img v-lazy="item.avatar" alt="" class="avatar">
@@ -19,7 +20,7 @@
     </ul>
     
     <!--右侧快速定位列表-->
-    <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove.stop.prevent="onShortcutTouchMove">
+    <div class="list-shortcut" :class="theme" @touchstart="onShortcutTouchStart" @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
         <li class="item" v-for="(item, index) in shortcutList" 
           :data-index="index" 
@@ -34,7 +35,7 @@
       <loading></loading>
     </div>
     <div class="list-fixed" v-show="fixedTitle" ref="fixed">
-      <h1 class="fixed-title"> {{fixedTitle}} </h1>
+      <h1 class="fixed-title" :class="theme"> {{fixedTitle}} </h1>
     </div>
   </scroll>
 </template>
@@ -181,14 +182,12 @@
   }
 </script>
 <style lang="stylus">
-  @import "~common/stylus/variable"
-
   .list-view
     position: relative
     width: 100%
     height: 100%
     overflow: hidden
-    background: $color-background
+    extend-styles(background, $color-background)
     .list-group
       padding-bottom: 30px
       .list-group-title
@@ -197,7 +196,7 @@
         padding-left: 20px
         font-size: $font-size-small
         color: $color-text-l
-        background: $color-highlight-background
+        extend-styles(background, $color-highlight-background)
       .list-group-item
         display: flex
         align-items: center
@@ -220,7 +219,7 @@
       padding: 20px 0
       border-radius: 10px
       text-align: center
-      background: $color-background-d
+      extend-styles(background, $color-background-d)
       font-family: Helvetica
       .item
         padding: 3px
@@ -240,7 +239,7 @@
         padding-left: 20px
         font-size: $font-size-small
         color: $color-text-l
-        background: $color-highlight-background
+        extend-styles(background, $color-highlight-background)
     .loading-container
       position: absolute
       width: 100%

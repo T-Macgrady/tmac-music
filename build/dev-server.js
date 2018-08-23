@@ -26,11 +26,18 @@ var proxyTable = config.dev.proxyTable
 var app = express()
 var compiler = webpack(webpackConfig)
 
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
 //  抓取qq音乐推荐歌单列表 后端代理 设置headers
 var apiRoutes = express.Router()
 apiRoutes.get('/getDiscList', function(req, res) {
   var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
-
+  console.log('getDiscList')
+  debugger
   axios.get(url, {
     headers: {
       referer: 'https://c.y.qq.com',
@@ -43,8 +50,25 @@ apiRoutes.get('/getDiscList', function(req, res) {
     console.log(error)
   })
 })
+
+app.get('/soso/fcgi-bin/search_for_qq_cp', function(req, res) {
+  var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+  axios.get(url, {
+    headers: {
+      referer: 'https://c.y.qq.com/',
+      host: 'c.y.qq.com'
+    }
+  }).then((response) => {
+    res.json(response.data)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+
 apiRoutes.get('/lyric', function(req, res) {
   var url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
+  console.log('lyric')
+  debugger
 
   axios.get(url, {
     headers: {
@@ -69,6 +93,7 @@ apiRoutes.get('/lyric', function(req, res) {
 
 apiRoutes.get('/getCdInfo', function (req, res) {
   var url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
+  console.log('getCdInfo')
   axios.get(url, {
       headers: {
           referer: 'https://c.y.qq.com/',
@@ -89,9 +114,28 @@ apiRoutes.get('/getCdInfo', function (req, res) {
   }).catch((e)=> {
       console.log(e)
   })
-
 })
 
+apiRoutes.post('/getPurlUrl', function (req, res) {
+  var url = 'http://ustbhuangyi.com/music/api/getPurlUrl'
+  var data = req.body
+  console.log(data)
+  axios({
+    url,
+    method: 'post',
+    headers: {
+        referer: 'http://ustbhuangyi.com',
+        host: 'ustbhuangyi.com'
+    },
+    data,
+  }).then((response) => {
+    var ret = response.data
+    console.log(ret)
+    res.json(ret)
+  }).catch((e)=> {
+      console.log(e)
+  })
+})
 
 app.use('/api', apiRoutes)
 

@@ -172,9 +172,6 @@
   }
 </script>
 <style scoped lang="stylus">
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
-
   .suggest
     height: 100%
     overflow: hidden

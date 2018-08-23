@@ -6,7 +6,7 @@
           <div class="icon">
             <img src="" alt="" width="100" height="100" v-lazy="item.picUrl">
           </div>
-          <ul class="songlist">
+          <ul class="songlist" :class="theme">
             <li class="song" v-for="(song, index) in item.songList" :key="song.key">
               <span> {{index + 1}} </span>
               <span> {{song.songname}} - {{song.singername}} </span>
@@ -68,9 +68,6 @@
   }
 </script>
 <style lang="stylus" scoped>
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
-
    .rank
     position: fixed
     width: 100%
@@ -98,7 +95,7 @@
           padding: 0 20px
           height: 100px
           overflow: hidden
-          background: $color-highlight-background
+          extend-styles(background, $color-background)
           color: $color-text-d
           font-size: $font-size-small
           .song

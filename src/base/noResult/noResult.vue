@@ -17,8 +17,6 @@
 </script>
 
 <style scoped lang="stylus">
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
 
   .no-result
     text-align: center

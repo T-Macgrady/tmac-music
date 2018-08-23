@@ -1,6 +1,6 @@
   <template>
   <transition name="drop">
-    <div class="top-tip" v-show="showFlag" @click.stop="hide">
+    <div class="top-tip" :class="theme" v-show="showFlag" @click.stop="hide">
       <slot></slot>
     </div>
   </transition>
@@ -35,14 +35,12 @@
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
-
   .top-tip
     position: fixed
     top: 0
     width: 100%
     z-index: 500
-    background: $color-dialog-background
+    extend-styles(background, $color-dialog-background)
     &.drop-enter-active, &.drop-leave-active
       transition: all 0.3s
     &.drop-enter, &.drop-leave-to
