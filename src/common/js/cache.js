@@ -100,5 +100,5 @@ export function saveTheme(theme) {
 }
 
 export function loadTheme() {
-  return storage.get(THEME_KEY, '')
+  return storage.get(THEME_KEY, 'black')
 }

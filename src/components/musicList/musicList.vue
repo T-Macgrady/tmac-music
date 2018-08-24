@@ -17,7 +17,7 @@
     <!--滑动辅助层-->
     <div class="bg-layer" :class="theme" ref="layer"></div>
     <!--歌曲列表-->
-    <scroll :data="songs" 
+    <scroll :data="songsUrlReady" 
       @scroll="scroll"
       :listen-scroll="listenScroll" 
       :probe-type="probeType" 
@@ -26,7 +26,8 @@
       ref="list"
     >
       <div class="song-list-wrapper">
-        <song-list 
+        <song-list
+          v-show="songsUrlReady"
           :songs="songs"
           :rank="rank"
           @select="selectItem"
@@ -34,7 +35,7 @@
         </song-list>
       </div>
       <!--加载loading-->
-      <div v-show="!songs.length" class="loading-container">
+      <div v-show="!songsUrlReady" class="loading-container">
         <loading></loading>
       </div>
     </scroll>
@@ -83,7 +84,6 @@
         return `background-image:url(${this.bgImage})`
       },
       songsUrlReady() {
-        // debugger
         const length = this.songs.length
         return !!length && !!(this.songs[0].url)
       }
@@ -111,47 +111,16 @@
       back() {
         this.$router.back()
       },
-      // selectItem(item, index) {
-      //   // debugger
-      //   console.log(this.$watch)
-      //   if (this.songsUrlReady) {
-      //     this.selectPlay({
-      //       list: this.songs,
-      //       index
-      //     })
-      //   } else {
-      //     this.$watch(function () {
-      //       return this.songsUrlReady
-      //     }, function () {
-      //       this.selectPlay({
-      //         list: this.songs,
-      //         index
-      //       })
-      //     })
-      //   }
-      // },
       selectItem(item, index) {
-        this.setWatcher('songsUrlReady', 'selectPlay', {
+        this.selectPlay({
           list: this.songs,
           index
-        }, index)
-      },
-      random() {
-        this.setWatcher('songsUrlReady', 'randomPlay', {
-          list: this.songs
         })
       },
-      setWatcher(data, method, ...rest) {
-        if (this[data]) {
-          this[method].apply(null, rest)
-        } else {
-          this.unwatch = this.$watch(function () {
-            return this[data]
-          }, function () {
-            this[method].apply(null, rest)
-            this.unwatch()
-          })
-        }
+      random() {
+        this.randomPlay({
+          list: this.songs
+        })
       },
       ...mapActions([
         'selectPlay',

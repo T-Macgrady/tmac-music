@@ -2,7 +2,7 @@
 * @Author: Lizhhmac
 * @Date:   2018-08-23 19:32:01
 * @Last Modified by:   Lizhhmac
-* @Last Modified time: 2018-08-23 19:39:51
+* @Last Modified time: 2018-08-24 15:34:58
 */
 const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]/g
 
@@ -21,14 +21,14 @@ function noop() {
 }
 
 export default class Lyric {
-  constructor(lrc, hanlder = noop) {
+  constructor(lrc, hanlder = noop, arg) {
     this.lrc = lrc
     this.tags = {}
     this.lines = []
     this.handler = hanlder
     this.state = STATE_PAUSE
     this.curLine = 0
-
+    this.id = arg
     this._init()
   }
 
@@ -82,7 +82,8 @@ export default class Lyric {
     this.handler({
       txt: this.lines[i].txt,
       lineNum: i,
-      lyric: this
+      lyric: this,
+      arg: this.arg
     })
   }
 
@@ -136,5 +137,10 @@ export default class Lyric {
 
   seek(offset) {
     this.play(offset)
+  }
+
+  destroy() {
+    this.stop()
+    this.timer = null
   }
 }

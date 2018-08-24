@@ -26,7 +26,7 @@ const state = {
   // 用户中心
   favoriteList: loadFavorite(),
   // 主题设置
-  theme: loadTheme() || 'black'
+  theme: loadTheme()
 }
 
 export default state
