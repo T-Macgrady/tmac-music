@@ -31,14 +31,20 @@
     },
     data() {
       return {
-        offsetWidth: 0
+        offsetWidth: 0,
+        barWidth: 0
       }
     },
     computed: {
+      progressScale() {
+        return this.barWidth
+        ? this.offsetWidth / this.barWidth : 0
+      },
       // 进度条&按钮动画样式
       progStyle() {
         return {
-          width: `${this.offsetWidth}px`
+          // width: `${this.offsetWidth}px`
+          transform: `scaleX(${this.progressScale})`
         }
       },
       btnStyle() {
@@ -50,17 +56,14 @@
     watch: {
       // 监测父组件随时间变化的percent，设置进度动画样式
       percent(newVal) {
-        if (newVal >= 0 && !this.touch.initiated) {
-          this.offsetWidth = newVal * this.barWidth
-        }
+        this.setProgressOffset(newVal)
+        // 除去BTN宽度后的进度条长度
+        if (this.barWidth) return
+        this.barWidth = this.$refs.progressBar.clientWidth - this.$refs.progressBtn.offsetWidth
       }
     },
     created() {
       this.touch = {}
-    },
-    mounted() {
-      // 除去BTN宽度后的进度条长度
-      this.barWidth = this.$refs.progressBar.clientWidth - this.$refs.progressBtn.offsetWidth
     },
     methods: {
       // 进度条拖动效果
@@ -69,7 +72,7 @@
         this.touch.initiated = true
         this.touch.startX = e.touches[0].pageX
         // 当前移动的位置
-        this.touch.left = this.$refs.progress.clientWidth
+        this.touch.left = this.$refs.progress.clientWidth * this.progressScale
       },
       progressTouchMove(e) {
         if (!this.touch.initiated) return
@@ -92,9 +95,13 @@
       progressClick(e) {
         if (this.audioError || !this.songReady) return
         const rect = this.$refs.progressBar.getBoundingClientRect()
-        // debugger
         this.offsetWidth = e.clientX - rect.left
         this._triggerPercent()
+      },
+      setProgressOffset: function(percent) {
+        if (percent >= 0 && !this.touch.initiated) {
+          this.offsetWidth = percent * this.barWidth
+        }
       }
     }
   }
@@ -111,6 +118,8 @@
       .progress
         position: absolute
         height: 100%
+        width: 100%
+        transform-origin: left
         background: $color-theme
       .progress-btn-wrapper
         position: absolute

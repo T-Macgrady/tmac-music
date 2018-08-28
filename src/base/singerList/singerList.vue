@@ -104,8 +104,6 @@
           if (-newY >= height1 && -newY < height2) {
             this.currentIndex = i
             this.diff = height2 + newY
-            // console.log(this.diff)
-            // console.log(this.currentIndex)
             return
           }
         }
@@ -119,7 +117,6 @@
           return
         }
         this.fixedTop = fixedTop
-        // console.log(this.fixedTop)
         this.$refs.fixed.style.transform = `translate3d(0, ${fixedTop}px, 0)`
       }
     },
@@ -148,7 +145,6 @@
       // 监听scroll组件派发的scroll事件 获取滚动时的pos值
       scroll(pos) {
         this.scrollY = pos.y
-        // console.log(this.scrollY)
       },
       _scrollTo(index) {
         if (!index && index !== 0) {

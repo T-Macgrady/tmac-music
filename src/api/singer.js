@@ -8,7 +8,7 @@ export function getSingerList() {
     channel: 'singer',
     page: 'list',
     key: 'all_all_all',
-    pagesize: 100,
+    pagesize: 50,
     pagenum: 1,
     g_tk: 5381,
     loginUin: 0,

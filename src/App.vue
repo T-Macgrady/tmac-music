@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div 
-    @touchstart.prevent="switchStart"
+    @touchstart="switchStart"
     @touchend="switchEnd"
     >
       <m-header></m-header>
@@ -57,7 +57,6 @@
     },
     methods: {
       switchStart(e) {
-        // 初始化tuoch的start move状态
         this.touch.initiated = true
 
         const touch = e.touches[0]
@@ -70,8 +69,9 @@
         const touch = e.changedTouches[0]
         const deltaX = touch.screenX - this.touch.startX
         const deltaY = touch.screenY - this.touch.startY
-        // 不是水平滑动则返回
-        if (Math.abs(deltaX) < Math.abs(deltaY)) return
+        // 不是水平滑动则返回，是则阻止默认点击事件
+        if (Math.abs(deltaX) <= Math.abs(deltaY)) return
+        e.preventDefault()
 
         const percent = Math.abs(deltaX / window.innerWidth)
         if (percent < 0.3) return

@@ -1,6 +1,6 @@
-<template> 
+<template>
   <transition name="slide">
-    <music-list :songs="songs" :bg-image="bgImage" :title="title"></music-list>
+    <music-list :songs="songs" :urlReady="urlReady" :bg-image="bgImage" :title="title"></music-list>
   </transition>
 </template>
 <script>
@@ -12,7 +12,8 @@
   export default {
     data() {
       return {
-        songs: []
+        songs: [],
+        urlReady: false
       }
     },
     components: {
@@ -41,7 +42,7 @@
         let that = this
         getSingerDetail(this.singer.id).then(res => {
           if (res.code === ERR_OK) {
-            createSongs(res.data.list, 'singer', that)
+            this.songs = createSongs(res.data.list, 'singer', that)
           }
         })
       }

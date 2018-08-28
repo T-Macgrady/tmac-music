@@ -1,6 +1,6 @@
 <template>
   <transition name="slide">
-    <music-list :title="title" :bgImage="bgImage" :songs="songs" :rank="true"></music-list>
+    <music-list :title="title" :bgImage="bgImage" :songs="songs" :urlReady="urlReady" :rank="true"></music-list>
   </transition>
 </template>
 <script>
@@ -14,6 +14,7 @@
     data() {
       return {
         songs: [],
+        urlReady: false,
         rank: true
       }
     },
@@ -46,7 +47,7 @@
         let that = this
         getTopListDetail(this.topList.id).then(res => {
           if (res.code === ERR_OK) {
-            createSongs(res.songlist, 'rank', that)
+            this.songs = createSongs(res.songlist, 'rank', that)
           }
         })
       }

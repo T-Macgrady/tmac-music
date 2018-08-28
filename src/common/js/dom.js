@@ -1,6 +1,5 @@
 export function addClass(el, className) {
   if (hasClass(el, className)) return
-    // console.log(hasClass(el, className))
   let newClass = el.className.split(' ')
   newClass.push(className)
   el.className = newClass.join(' ')
@@ -52,4 +51,16 @@ export function prefixStyle(style) {
   }
   // 拼接 eg：webkitTransform
   return vendor + style.charAt(0).toUpperCase() + style.substr(1)
+}
+
+export function getAnimationEnd() {
+  const animEndEventNames = {
+    WebkitAnimation: 'webkitAnimationEnd',
+    animation: 'animationend'
+  }
+  for (const key in animEndEventNames) {
+    if (elementStyle[key] !== undefined) {
+      return animEndEventNames[key]
+    }
+  }
 }

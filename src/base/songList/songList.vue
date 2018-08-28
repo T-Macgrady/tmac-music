@@ -23,8 +23,7 @@
   export default {
     props: {
       songs: {
-        type: Array,
-        default: []
+        type: Array
       },
       rank: {
         type: Boolean,

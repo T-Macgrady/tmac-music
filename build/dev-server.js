@@ -1,5 +1,5 @@
 require('./check-versions')()
- 
+  
 var config = require('../config')
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = JSON.parse(config.dev.env.NODE_ENV)
@@ -136,6 +136,34 @@ apiRoutes.post('/getPurlUrl', function (req, res) {
       console.log(e)
   })
 })
+
+apiRoutes.get('/soso/fcgi-bin/search_for_qq_cp', function(req, res) {
+  var url = 'http://ustbhuangyi.com/music/api/search'
+  axios.get(url, {
+    headers: {
+      referer: 'http://ustbhuangyi.com/music/',
+      host: 'ustbhuangyi.com'
+    }
+  }).then((response) => {
+    res.json(response.data)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+
+// apiRoutes.get('/soso/fcgi-bin/search_for_qq_cp', function(req, res) {
+//   var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+//   axios.get(url, {
+//     headers: {
+//       referer: 'https://c.y.qq.com/',
+//       host: 'c.y.qq.com'
+//     }
+//   }).then((response) => {
+//     res.json(response.data)
+//   }).catch((e) => {
+//     console.log(e)
+//   })
+// })
 
 app.use('/api', apiRoutes)
 

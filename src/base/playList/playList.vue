@@ -96,7 +96,7 @@
         setTimeout(() => {
           this.$refs.listContent.refresh()
           this.scrollToCurrent(this.currentSong)
-        }, 20)
+        }, 50)
       },
       hide() {
         this.showFlag = false
@@ -157,9 +157,9 @@
     z-index: 200
     extend-styles(background-color, $color-background-d)
     &.list-fade-enter-active, &.list-fade-leave-active
-      transition: opacity 0.3s
+      transition: opacity .2s
       .list-wrapper
-        transition: all 0.3s
+        transition: all .2s
     &.list-fade-enter, &.list-fade-leave-to
       opacity: 0
       .list-wrapper

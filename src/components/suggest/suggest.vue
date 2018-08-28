@@ -1,7 +1,7 @@
 <template>
   <scroll 
     class="suggest" 
-    :data="result"
+    :data="songs"
     :pullUp="pullUp"
     @scrollToEnd="searchMore"
     :beforeScroll="beforeScroll"
@@ -11,7 +11,8 @@
     <ul class="suggest-list">
       <li 
         class="suggest-item"
-        v-for="item in result"
+        v-show="urlReady"
+        v-for="item in songs"
         :key="item.key"
         @click="selectItem(item)"
       >
@@ -24,7 +25,7 @@
       </li>
       <loading v-show="hasMore" title=""></loading>
     </ul>
-    <div v-show="!hasMore && !result.length" class="no-result-wrapper">
+    <div v-show="!hasMore && !songs.length" class="no-result-wrapper">
       <no-result title="抱歉，暂无搜索结果"></no-result>
     </div>
   </scroll>
@@ -32,7 +33,7 @@
 <script>
   import { ERR_OK } from 'api/config'
   import { search } from 'api/search'
-  import { createSong } from 'common/js/song'
+  import { createSongs } from 'common/js/song'
   import Singer from 'common/js/singer'
   import Scroll from 'base/scroll'
   import Loading from 'base/loading'
@@ -63,7 +64,13 @@
         result: [],
         pullUp: true,
         hasMore: true,
-        beforeScroll: true
+        beforeScroll: true,
+        urlReady: false
+      }
+    },
+    computed: {
+      songs() {
+        return this.result
       }
     },
     methods: {
@@ -145,22 +152,12 @@
       _getResult(data) {
         let ret = []
 
-        if (data.zhida && data.zhida.singerid) {
-          ret.push({...data.zhida, ...{type: TYPE_SINGER}})
-        }
         if (data.song) {
-          ret = ret.concat(this._normalizeSongs(data.song.list))
+          ret.push(createSongs(data.song.list, 'searh', this))
         }
-
-        return ret
-      },
-      _normalizeSongs(list) {
-        let ret = []
-        list.forEach((musicData) => {
-          if (musicData.songid && musicData.albummid) {
-            ret.push(createSong(musicData))
-          }
-        })
+        if (data.zhida && data.zhida.singerid) {
+          ret = ret.concat({...data.zhida, ...{type: TYPE_SINGER}})
+        }
         return ret
       }
     },

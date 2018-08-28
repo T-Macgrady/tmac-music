@@ -6,10 +6,15 @@ import fastclick from 'fastclick'
 import App from './App'
 import router from './router'
 import VueLazyLoad from 'vue-lazyload'
+// import VConsole from 'vconsole'
 import './common/stylus/index.styl'
 import store from './store'
 import {mapGetters} from 'vuex'
 
+// if (process.env.NODE_ENV !== 'production') {
+//   const vConsole = new VConsole()
+//   console.log(vConsole.version)
+// }
 Vue.mixin({
   computed: {
     ...mapGetters(['theme'])

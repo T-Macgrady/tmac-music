@@ -50,7 +50,6 @@ export function createSongs(list, type, vm) {
   let songMidList = []
   let songType = []
   let songs = []
-  // debugger
   list.forEach((item) => {
     let musicData = null
     type === 'singer' ? ({musicData} = item) : (musicData = type === 'rank' && item.data || item)
@@ -59,19 +58,15 @@ export function createSongs(list, type, vm) {
     songMidList.push(musicData.songmid) && songType.push(musicData.songtype) &&
     songs.push(createSong(musicData))
   })
-  // debugger
   getPurlUrl(songMidList, songType).then((res) => {
-    // debugger
     res.forEach((item, i) => {
-      // debugger
       vm.songs[i]['url'] = item.purl ? item.purl : 'no support resourse'
     })
-    // vm.songs[i]['url'] = item.purl
+    vm.urlReady = true
   }).catch(e => {
     console.log(e)
   })
-  // debugger
-  vm.songs = songs
+  return songs
 }
 
 function filterSinger(singer) {
