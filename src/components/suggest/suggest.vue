@@ -98,6 +98,7 @@
       },
       search() {
         this.page = 1
+        this.result = []
         this.hasMore = true
         this.$refs.suggest.scrollTo(0, 0)
         search(this.query, this.page, this.showSinger, perpage)
