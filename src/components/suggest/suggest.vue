@@ -64,6 +64,7 @@
         songs: [],
         pullUp: true,
         hasMore: true,
+        zhida: false,
         beforeScroll: true
       }
     },
@@ -160,9 +161,10 @@
       _getResult(data) {
         let list = data.song.list
         if (data.zhida && data.zhida.singerid) {
-          if (this.zhida) return
-          list.zhida = {...data.zhida, ...{type: TYPE_SINGER}}
-          this.zhida = true
+          if (!this.zhida) {
+            list.zhida = {...data.zhida, ...{type: TYPE_SINGER}}
+            this.zhida = true
+          }
         }
         if (data.song) {
           createSongs(list, 'searh', this)
