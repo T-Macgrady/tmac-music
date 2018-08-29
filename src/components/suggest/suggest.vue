@@ -100,6 +100,7 @@
         this.page = 1
         this.result = []
         this.hasMore = true
+        this.zhida = false
         this.$refs.suggest.scrollTo(0, 0)
         search(this.query, this.page, this.showSinger, perpage)
           .then(res => {
@@ -159,7 +160,9 @@
       _getResult(data) {
         let list = data.song.list
         if (data.zhida && data.zhida.singerid) {
+          if (this.zhida) return
           list.zhida = {...data.zhida, ...{type: TYPE_SINGER}}
+          this.zhida = true
         }
         if (data.song) {
           createSongs(list, 'searh', this)
