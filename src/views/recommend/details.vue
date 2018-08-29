@@ -1,6 +1,6 @@
 <template> 
   <transition name="slide">
-    <music-list :title="title" :bg-image="bgImage" :songs="songs" :urlReady="urlReady"></music-list>
+    <music-list :title="title" :bg-image="bgImage" :songs="songs"></music-list>
   </transition>
 </template>
 
@@ -25,8 +25,7 @@
     },
     data() {
       return {
-        songs: [],
-        urlReady: false
+        songs: []
       }
     },
     created() {
@@ -41,7 +40,7 @@
         let that = this
         getSongList(this.disc.dissid).then((res) => {
           if (res.code === ERR_OK) {
-            this.songs = createSongs(res.cdlist[0].songlist, 'recommend', that)
+            createSongs(res.cdlist[0].songlist, 'recommend', that)
           }
         })
       }

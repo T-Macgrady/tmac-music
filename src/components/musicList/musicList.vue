@@ -8,7 +8,7 @@
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="play-wrapper">
-        <div ref="playBtn" v-show="urlReady" class="play" @click="random">
+        <div ref="playBtn" v-show="songs.length" class="play" @click="random">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -17,7 +17,7 @@
     <!--滑动辅助层-->
     <div class="bg-layer" :class="theme" ref="layer"></div>
     <!--歌曲列表-->
-    <scroll :data="urlReady"
+    <scroll :data="songs"
       @scroll="scroll"
       :listen-scroll="listenScroll" 
       :probe-type="probeType" 
@@ -27,7 +27,6 @@
     >
       <div class="song-list-wrapper">
         <song-list
-          v-show="urlReady"
           :songs="songs"
           :rank="rank"
           @select="selectItem"
@@ -35,7 +34,7 @@
         </song-list>
       </div>
       <!--加载loading-->
-      <div v-show="!urlReady" class="loading-container">
+      <div v-show="!songs.length" class="loading-container">
         <loading></loading>
       </div>
     </scroll>
@@ -70,10 +69,6 @@
       rank: {
         type: Boolean,
         default: false
-      },
-      urlReady: {
-        type: Boolean,
-        default: false
       }
     },
     data() {
@@ -85,10 +80,6 @@
       // 加载歌手背景图片
       bgStyle() {
         return `background-image:url(${this.bgImage})`
-      },
-      songsUrlReady() {
-        const length = this.songs.length
-        return !!length && !!(this.songs[0].url)
       }
     },
     created() {

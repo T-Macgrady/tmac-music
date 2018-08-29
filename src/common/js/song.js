@@ -60,13 +60,13 @@ export function createSongs(list, type, vm) {
   })
   getPurlUrl(songMidList, songType).then((res) => {
     res.forEach((item, i) => {
-      vm.songs[i]['url'] = item.purl ? item.purl : 'no support resourse'
+      songs[i]['url'] = item.purl ? item.purl : 'no support resourse'
     })
-    vm.urlReady = true
+    list.zhida && (songs.zhida = list.zhida)
+    vm.songs = songs
   }).catch(e => {
     console.log(e)
   })
-  return songs
 }
 
 function filterSinger(singer) {

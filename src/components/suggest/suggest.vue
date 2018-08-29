@@ -1,7 +1,7 @@
 <template>
   <scroll 
     class="suggest" 
-    :data="songs"
+    :data="result"
     :pullUp="pullUp"
     @scrollToEnd="searchMore"
     :beforeScroll="beforeScroll"
@@ -11,8 +11,7 @@
     <ul class="suggest-list">
       <li 
         class="suggest-item"
-        v-show="urlReady"
-        v-for="item in songs"
+        v-for="item in result"
         :key="item.key"
         @click="selectItem(item)"
       >
@@ -25,7 +24,7 @@
       </li>
       <loading v-show="hasMore" title=""></loading>
     </ul>
-    <div v-show="!hasMore && !songs.length" class="no-result-wrapper">
+    <div v-show="!hasMore && !result.length" class="no-result-wrapper">
       <no-result title="抱歉，暂无搜索结果"></no-result>
     </div>
   </scroll>
@@ -62,15 +61,22 @@
       return {
         page: 1,
         result: [],
+        songs: [],
         pullUp: true,
         hasMore: true,
-        beforeScroll: true,
-        urlReady: false
+        beforeScroll: true
       }
     },
-    computed: {
-      songs() {
-        return this.result
+    watch: {
+      query() {
+        this.search()
+      },
+      songs(newSongs) {
+        // newSongs.zhida && newSongs.unshift(newSongs.zhida)
+        // this.result = [...this.result, ...newSongs]
+        this.result = newSongs.zhida === undefined
+          ? [...this.result, ...newSongs]
+          : [...this.result, newSongs.zhida, ...newSongs]
       }
     },
     methods: {
@@ -97,7 +103,7 @@
         search(this.query, this.page, this.showSinger, perpage)
           .then(res => {
             if (res.code === ERR_OK) {
-              this.result = this._getResult(res.data)
+              this._getResult(res.data)
               this._checkHasMore(res.data)
             }
           })
@@ -108,7 +114,7 @@
         search(this.query, this.page, this.showSinger, perpage)
           .then(res => {
             if (res.code === ERR_OK) {
-              this.result = this.result.concat(this._getResult(res.data))
+              this._getResult(res.data)
               this._checkHasMore(res.data)
             }
           })
@@ -150,20 +156,13 @@
         }
       },
       _getResult(data) {
-        let ret = []
-
-        if (data.song) {
-          ret.push(createSongs(data.song.list, 'searh', this))
-        }
+        let list = data.song.list
         if (data.zhida && data.zhida.singerid) {
-          ret = ret.concat({...data.zhida, ...{type: TYPE_SINGER}})
+          list.zhida = {...data.zhida, ...{type: TYPE_SINGER}}
         }
-        return ret
-      }
-    },
-    watch: {
-      query() {
-        this.search()
+        if (data.song) {
+          createSongs(list, 'searh', this)
+        }
       }
     }
   }
