@@ -98,10 +98,10 @@
     },
     watch: {
       query(newQuery) {
-        if(!newQuery) {
-          this.$nextTick(() => {
+        if( !newQuery ) {
+          setTimeout(() => {
             this.$refs.shortcut.refresh()
-          })
+          }, this.refreshDelay)
         }
       }
     },
