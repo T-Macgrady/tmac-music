@@ -98,9 +98,9 @@
     },
     watch: {
       query(newQuery) {
-        if( !newQuery ) {
+        if (!newQuery) {
           setTimeout(() => {
-            this.$refs.shortcut.refresh()
+            this.handlePlayList()
           }, this.refreshDelay)
         }
       }
