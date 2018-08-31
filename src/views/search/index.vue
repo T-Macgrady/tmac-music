@@ -100,7 +100,7 @@
       query(newQuery) {
         if (!newQuery) {
           setTimeout(() => {
-            this.handlePlayList()
+            this.handlePlayList(this.playlist)
           }, this.refreshDelay)
         }
       }
