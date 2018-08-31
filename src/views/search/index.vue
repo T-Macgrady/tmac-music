@@ -96,6 +96,11 @@
         return this.hotkey.concat(this.searchHistory)
       }
     },
+    watch: {
+      query(newQuery) {
+        !newQuery && this.$refs.shortcut.refresh()
+      }
+    },
     created() {
       this._getHotKey()
     },
