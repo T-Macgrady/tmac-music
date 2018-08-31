@@ -42,7 +42,7 @@ export function createSong(musicData) {
     album: musicData.albumname,
     duration: musicData.interval,
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    url: ''
+    url: `${musicData.songmid}`
   })
 }
 
@@ -59,9 +59,30 @@ export function createSongs(list, type, vm) {
     songs.push(createSong(musicData))
   })
   getPurlUrl(songMidList, songType).then((res) => {
+    let noPurl = []
+    let noSourse = []
+    let standardUrl = null
     res.forEach((item, i) => {
-      songs[i]['url'] = item.purl ? item.purl : 'no support resourse'
+      if (item.purl) {
+        songs[i]['url'] = item.purl
+        !standardUrl && (standardUrl = item.purl)
+      } else if (songs[i]['url']) {
+        noPurl.push(i)
+      } else {
+        noSourse.push(i)
+      }
     })
+    console.log(noPurl)
+    noPurl.forEach((item, index) => {
+      const songmid = songs[item]['url']
+      const reg = /\/(\w+)\.m4a/
+      // const reg = new RegExp('\\/\\w{18}\\.m4a')
+      songs[item]['url'] = standardUrl.replace(reg, `/C400${songmid}.m4a`)
+    })
+    noSourse.forEach((item, index) => {
+      songs.splice(item - index, 1)
+    })
+    console.log(songs)
     list.zhida && (songs.zhida = list.zhida)
     vm.songs = songs
   }).catch(e => {

@@ -51,7 +51,11 @@
       _getTopList() {
         getTopList().then(res => {
           if (res.code === ERR_OK) {
-            this.topList = res.data.topList
+            let topList = res.data.topList
+            topList = topList.filter(item => {
+              return item.id !== 201
+            })
+            this.topList = topList
           }
         })
       },

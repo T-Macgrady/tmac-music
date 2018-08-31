@@ -14,16 +14,45 @@ export function shuffle(arr) {
   return _arr
 }
 
-// 函数节流
-export function debounce(func, delay) {
-  let timer
+// 获取单例
+export function getSingle(fn) {
+  let result
+  return function() {
+    return result || (result = fn.apply(this, arguments))
+  }
+}
 
+// 只运行一次
+export function oneRun(fn) {
+  let flag = false
+  return function (...arg) {
+    !flag && (fn.apply(this, arg), flag = true)
+  }
+}
+
+// 去抖
+export function debounce(fn, delay) {
+  let timer
   return function(...args) {
     if (timer) {
       clearTimeout(timer)
+      timer = null
     }
     timer = setTimeout(() => {
-      func.apply(this, args)
+      fn.apply(this, args)
+    }, delay)
+  }
+}
+
+// 截流
+export function throttle(fn, delay) {
+  let timer
+  return function(...args) {
+    if (timer) return
+    timer = setTimeout(() => {
+      fn.apply(this, args)
+      clearTimeout(timer)
+      timer = null
     }, delay)
   }
 }

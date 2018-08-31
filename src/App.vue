@@ -76,14 +76,16 @@
         const percent = Math.abs(deltaX / window.innerWidth)
         if (percent < 0.3) return
         let index = this.index
+        const len = this.themes.length
         deltaX > 0 ? index++ : index--
-        if (index > 3) {
-          this.index = 0
-        } else if (index < 0) {
-          this.index = 3
-        } else {
-          this.index = index
-        }
+        // if (index > len - 1) {
+        //   this.index = 0
+        // } else if (index < 0) {
+        //   this.index = len - 1
+        // } else {
+        //   this.index = index
+        // }
+        this.index = index % len >= 0 ? index % len : (len - 1)
         // 触发换肤事件并去除int/move标记
         this.$emit('switch', this.currentTheme)
         this.touch.initiated = false

@@ -31,7 +31,7 @@ export function getSingerDetail(singerId) {
     g_tk: 5381,
     loginUin: 0,
     hostUin: 0,
-    format: jsonp,
+    format: 'jsonp',
     inCharset: 'utf8',
     outCharset: 'utf-8',
     notice: 0,
@@ -40,7 +40,7 @@ export function getSingerDetail(singerId) {
     singermid: singerId,
     order: 'listen',
     begin: 0,
-    num: 100,
+    num: 50,
     songstatus: 1
   })
 

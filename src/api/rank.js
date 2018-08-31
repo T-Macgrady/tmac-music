@@ -21,7 +21,8 @@ export function getTopListDetail(topid) {
     needNewCode: 1,
     page: 'detail',
     type: 'top',
-    tpl: 3
+    tpl: 3,
+    song_num: 100
   })
 
   return jsonp(url, data, options)

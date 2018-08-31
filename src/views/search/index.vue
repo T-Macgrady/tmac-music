@@ -13,21 +13,22 @@
         ref="shortcut"
         :refreshDelay="refreshDelay"
       >
-        <div class="hot-key">
-          <h1 class="title">热门搜索</h1>
-          <ul>
-            <li class="item" 
-              :class="theme"
-              v-for="item in hotkey" 
-              :key="item.key"
-              @click="addQuery(item.k)"
-            >
-              <span>{{item.k}}</span>
-            </li>
-          </ul>
-        </div>
-        <!--搜索历史部分-->
-        <div class="search-history" v-show="searchHistory.length">
+        <div>
+          <div class="hot-key">
+            <h1 class="title">热门搜索</h1>
+            <ul>
+              <li class="item" 
+                :class="theme"
+                v-for="item in hotkey" 
+                :key="item.key"
+                @click="addQuery(item.k)"
+              >
+                <span>{{item.k}}</span>
+              </li>
+            </ul>
+          </div>
+          <!--搜索历史部分-->
+          <div class="search-history" v-show="searchHistory.length">
           <h1 class="title">
             <span class="text">搜索历史</span>
             <span @click="showConfirm" class="clear">
@@ -41,6 +42,7 @@
             :searches="searchHistory"
           >
           </search-list>
+          </div>
         </div>
       </scroll>
     </div>

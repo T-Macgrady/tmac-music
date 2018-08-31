@@ -449,18 +449,21 @@
           return
         } else {
           let index = this.currentIndex
-          let len = this.playList.length - 1
+          let len = this.playList.length
           if (e) {
             e.currentTarget.className === 'icon-prev' ? index-- : index++
           } else {
             index++
           }
-          if (index < 0) {
-            index = len
-          } else if (index > len) {
-            index = 0
-          }
-          this.setCurrentIndex(index)
+          // if (index < 0) {
+          //   index = len - 1
+          // } else if (index > len - 1) {
+          //   index = 0
+          // }
+          const remainder = index % len
+          const currIndex = remainder >= 0 ? remainder : len - 1
+          console.log(currIndex)
+          this.setCurrentIndex(currIndex)
           !this.playing && this.togglePlaying()
         }
       },
