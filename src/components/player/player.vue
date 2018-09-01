@@ -38,7 +38,7 @@
                   {{playingLyric}}
                 </div>
               </div>
-              <p v-html="errorTip" v-if="audioError" class="errorTip"></p>
+              <p v-html="errorTip" v-if="audioError || manualPlay" class="errorTip"></p>
             </div>
             <!--歌词滚动-->
             <scroll class="middle-r" ref="lyriclist" :style="moveStyle" :data="currentLyric && currentLyric.lines">
@@ -160,6 +160,7 @@
         currentLineNum: 0,
         currentShow: 'cd',
         playingLyric: '',
+        manualPlay: false,
         time: 0,
         opacity: 1,
         offsetWidth: null,
@@ -249,12 +250,22 @@
         // 获取并播放歌曲&歌词
         const audio = this.$refs.audio
         audio.src = newSong.url
-        audio.play()
+        audio.play().catch(e => {
+          // uc浏览器无法自动播放处理
+          if (e.code === 0) {
+            this.manualPlay = true
+            // 相当于进入暂停状态,等待点击
+            this.songReady = true
+            this.setPlayingState(false)
+
+            this.errorTip = '该浏览器不支持自动播放,请点击按钮播放 ^-^'
+          }
+        })
         this.getLyric()
       },
       // 歌曲播放/暂停
       playing(newPlaying) {
-        if (!this.songReady) return
+        if (!this.songReady || this.manualPlay) return
         const audio = this.$refs.audio
         this.$nextTick(() => {
           newPlaying ? audio.play() : audio.pause()
@@ -275,6 +286,7 @@
           this.errorTip = ''
         }
         this.songReady && (this.songReady = false)
+        this.manualPlay && (this.manualPlay = false)
         // 清除音量变化的interval/尾部标记
         this.clearIntl()
         this.musicEnd && (this.musicEnd = false)
@@ -288,6 +300,7 @@
 
       // 已加载足够数据可开始播放，切换至play状态
       ready() {
+        this.manualPlay && (this.songReady = false)
         if (this.songReady) {
           this.lyricPlay()
         } else {
@@ -302,11 +315,7 @@
       handleFlag() {
         this.songReady = true
         this.errorTip && (this.errorTip = '')
-        // 防止异常情况audio未切至播放状态
-        setTimeout(() => {
-          this.playing && this.$refs.audio.paused && this.$refs.audio.play()
-          !this.songReady && (this.songReady = true)
-        }, 3000)
+        this.manualPlay && (this.manualPlay = false)
       },
       error(e) {
         this.handleError()
@@ -369,13 +378,13 @@
       },
       setWatcher(data, method, ...rest) {
         if (this[data]) {
-          this[method].apply(null, rest)
+          !this.manualPlay && this[method].apply(null, rest)
         } else {
           this.unwatch = this.$watch(function () {
             return this[data]
           }, function (newValue, oldValue) {
             if (newValue === oldValue) return
-            this[method].apply(null, rest)
+            !this.manualPlay && this[method].apply(null, rest)
             this.unwatch()
           })
         }
@@ -441,7 +450,7 @@
 
       // 歌曲前进后退
       switchSong(e) {
-        if (!this.songReady) {
+        if (!this.songReady || this.manualPlay) {
           return
         }
         if (this.playList.length === 1) {
@@ -493,6 +502,7 @@
         if (!this.songReady || this.audioError) {
           return
         }
+        this.manualPlay && this.$refs.audio.play()
         this.setPlayingState(!this.playing)
         // 歌词随着歌曲播放暂停而滚动或暂停滚动
         this.currentLyric && this.currentLyric.togglePlay()
@@ -558,7 +568,7 @@
       enter(el, done) {
         this.cdAnim.mode = 'in'
         this.cdAnim.state = 'on'
-        this.$refs.cdWrapper.addEventListener(animationend, done)
+        this.$refs.cdWrapper.addEventListener(animationend, done, {once: true})
       },
       afterEnter() {
         this.cdAnim.state = 'off'
@@ -566,7 +576,7 @@
       leave(el, done) {
         this.cdAnim.mode = 'out'
         this.cdAnim.state = 'on'
-        this.$refs.cdWrapper.addEventListener(animationend, done)
+        this.$refs.cdWrapper.addEventListener(animationend, done, {once: true})
       },
       afterLeave() {
         this.cdAnim.state = 'off'
