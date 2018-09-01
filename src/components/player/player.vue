@@ -462,7 +462,6 @@
           // }
           const remainder = index % len
           const currIndex = remainder >= 0 ? remainder : len - 1
-          console.log(currIndex)
           this.setCurrentIndex(currIndex)
           !this.playing && this.togglePlaying()
         }

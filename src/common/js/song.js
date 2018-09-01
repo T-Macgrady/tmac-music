@@ -72,7 +72,6 @@ export function createSongs(list, type, vm) {
         noSourse.push(i)
       }
     })
-    console.log(noPurl)
     noPurl.forEach((item, index) => {
       const songmid = songs[item]['url']
       const reg = /\/(\w+)\.m4a/
@@ -82,7 +81,6 @@ export function createSongs(list, type, vm) {
     noSourse.forEach((item, index) => {
       songs.splice(item - index, 1)
     })
-    console.log(songs)
     list.zhida && (songs.zhida = list.zhida)
     vm.songs = songs
   }).catch(e => {
