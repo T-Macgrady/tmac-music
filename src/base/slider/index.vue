@@ -49,6 +49,7 @@
       if (this.autoPlay) {
         this._play()
       }
+      this.resizeHandle()
     },
     deactivated() {
       if (this.autoPlay) {
