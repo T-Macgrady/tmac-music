@@ -14,6 +14,7 @@
   </div>
 </template>
 <script>
+  import { throttle } from 'common/js/util'
   export default {
     props: {
       percent: {
@@ -25,6 +26,10 @@
         default: false
       },
       songReady: {
+        type: Boolean,
+        default: false
+      },
+      fullScreen: {
         type: Boolean,
         default: false
       }
@@ -59,13 +64,24 @@
         this.setProgressOffset(newVal)
         // 除去BTN宽度后的进度条长度
         if (this.barWidth) return
-        this.barWidth = this.$refs.progressBar.clientWidth - this.$refs.progressBtn.offsetWidth
+        this.getBarWidth()
       }
     },
     created() {
       this.touch = {}
     },
+    // 监听横竖屏，获取度条长度
+    mounted() {
+      this.debounceGetBarWidth = throttle(() => {
+        this.getBarWidth()
+      }, 50)
+      window.addEventListener('resize', this.debounceGetBarWidth)
+    },
     methods: {
+      getBarWidth() {
+        if (!this.fullScreen) return
+        this.barWidth = this.$refs.progressBar.clientWidth - this.$refs.progressBtn.offsetWidth
+      },
       // 进度条拖动效果
       progressTouchStart(e) {
         if (this.audioError || !this.songReady) return

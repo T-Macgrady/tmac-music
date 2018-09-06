@@ -11,6 +11,7 @@
 <script>
   import BScroll from 'better-scroll'
   import { addClass } from 'common/js/dom'
+  import { debounce } from 'common/js/util'
   export default {
     data() {
       return {
@@ -40,12 +41,9 @@
       if (this.autoPlay) {
         this._play()
       }
-      window.addEventListener('resize', () => {
-        if (!this.slider) return
-        // 窗口改变的大小时重新计算clienWidth 此时不需要再加上两个多余的width
-        this._setSliderWidth(true)
-        this.slider.refresh()
-      })
+      window.addEventListener('resize', debounce(() => {
+        this.resizeHandle()
+      }, 200))
     },
     activated() {
       if (this.autoPlay) {
@@ -63,6 +61,12 @@
       }
     },
     methods: {
+      resizeHandle() {
+        if (!this.slider) return
+        // 窗口改变的大小时重新计算clienWidth 此时不需要再加上两个多余的width
+        this._setSliderWidth(true)
+        this.slider.refresh()
+      },
       _setSliderWidth(isResize) {
         this.children = this.$refs.sliderGroup.children
         let width = 0

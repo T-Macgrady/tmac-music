@@ -33,12 +33,15 @@
                   <img :src="currentSong.image" alt="" class="image">
                 </div>
               </div>
-              <div class="playing-lyric-wrapper">
-                <div class="playing-lyric">
-                  {{playingLyric}}
+              <div class="text-wrapper">
+                <div class="text">
+                  <div class="playing-lyric">
+                    {{playingLyric}}
+                  </div>
+                  <p v-html="errorTip" v-if="audioError || manualPlay" class="errorTip">
+                  </p>
                 </div>
               </div>
-              <p v-html="errorTip" v-if="audioError || manualPlay" class="errorTip"></p>
             </div>
             <!--歌词滚动-->
             <scroll class="middle-r" ref="lyriclist" :style="moveStyle" :data="currentLyric && currentLyric.lines">
@@ -71,7 +74,8 @@
                 <progress-bar :percent="percent" 
                   ref="progressBar" 
                   :audioError="audioError" 
-                  :songReady="songReady" 
+                  :songReady="songReady"
+                  :fullScreen="fullScreen" 
                   @percentChange="onProgressBarChange">
                 </progress-bar>
               </div>
@@ -108,7 +112,7 @@
       <transition name="mini">
         <div class="mini-player" :class="theme" v-show="!fullScreen" @click="open">
           <div class="icon">
-            <img alt="" :src="currentSong.image" width="40" height="40" :class="cdCls">
+            <img alt="" :src="currentSong.image" :class="cdCls">
           </div>
           <div class="text">
             <h2 class="name" v-html="currentSong.name"></h2>
@@ -117,7 +121,7 @@
           <div class="control">
             <!--阻止冒泡-->
             <progress-circle :radius="radius" :percent="percent">
-              <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
+              <i @click.stop="togglePlaying" class="icon-mini" ref="iconMini" :class="miniIcon"></i>
             </progress-circle>
           </div>
           <div class="control" @click.stop="showPlayList">
@@ -141,7 +145,8 @@
   import { mapGetters, mapMutations, mapActions } from 'vuex'
   import ProgressBar from 'base/progressBar/progressBar'
   import ProgressCircle from 'base/progressCircle/progressCircle'
-  import { getAnimationEnd } from 'common/js/dom.js'
+  import { getAnimationEnd, getComputedStyle } from 'common/js/dom.js'
+  import { debounce } from 'common/js/util'
   import { playMode } from 'common/js/config'
   import Lyric from 'common/js/lyric-parse'
   import Scroll from 'base/scroll'
@@ -183,6 +188,15 @@
       this.touch = {}
       this.cdAnimStyle = document.querySelector('#cdanim')
       this.cdAnimStyle.innerHTML = this.getKeyframes()
+    },
+    mounted() {
+      this.offsetN = 5
+      window.addEventListener('resize', debounce(() => {
+        this.calcLyricPos()
+      }, 200))
+      this.$nextTick(() => {
+        this.radius = parseFloat(parseFloat(getComputedStyle(this.$refs.iconMini, 'fontSize')).toFixed(2))
+      })
     },
     computed: {
       // 计算CD&歌词切换touchEnd后的动画样式
@@ -368,6 +382,9 @@
         this.currentSong.getLyric().then(lyric => {
           this.currentLyric = new Lyric(lyric, this.handleLyric)
           this.setWatcher('songReady', 'lyricPlay')
+          this.$nextTick(() => {
+            this.calcLyricPos()
+          })
         }).catch(() => {
           this.clearLyric()
         })
@@ -395,13 +412,17 @@
           return
         }
         this.currentLineNum = lineNum
-        if (lineNum > 5) {
-          let lineEl = this.$refs.lyricLine[lineNum - 5]
+        if (lineNum > this.offsetN) {
+          let lineEl = this.$refs.lyricLine[lineNum - this.offsetN]
           this.$refs.lyriclist.scrollToElement(lineEl, 1000)
         } else {
           this.$refs.lyriclist.scrollTo(0, 0, 1000)
         }
         this.playingLyric = txt
+      },
+      calcLyricPos() {
+        if (!this.fullScreen) return
+        this.offsetN = Math.floor(this.$refs.lyriclist.$el.clientHeight / this.$refs.lyricLine[0].clientHeight / 2) - 1
       },
       clearLyric() {
         if (this.currentLyric) {
@@ -657,7 +678,7 @@
         filter: blur(20px)
       .top
         position: relative
-        margin-bottom: 25px
+        margin-bottom: calc(20 / 667 * 100vh)
         .back
           position absolute
           top: 0
@@ -672,21 +693,21 @@
         .title
           width: 70%
           margin: 0 auto
-          line-height: 40px
+          line-height: calc(40 / 667 * 100vh)
           text-align: center
           no-wrap()
           font-size: $font-size-large
           color: $color-text
         .subtitle
-          line-height: 20px
+          line-height: calc(20 / 667 * 100vh)
           text-align: center
           font-size: $font-size-medium
           color: $color-text
       .middle
         position: fixed
         width: 100%
-        top: 80px
-        bottom: 170px
+        top: calc(80 / 667 * 100vh)
+        bottom: calc(150 / 667 * 100vh)
         white-space: nowrap
         font-size: 0
         .middle-l
@@ -694,15 +715,15 @@
           vertical-align: top
           position: relative
           width: 100%
-          height: 0
-          padding-top: 80%
+          height: 100%
           .cd-wrapper
-            position: absolute
-            left: 10%
-            top: 0
-            width: 80%
-            height: 100%
+            margin: 0 auto
+            height: calc(300 / 667 * 100vh)
+            min-height: 70%
+            max-height: 90%
+            width: @height
             .cd
+              position: relative
               width: 100%
               height: 100%
               box-sizing: border-box
@@ -719,24 +740,28 @@
                 width: 100%
                 height: 100%
                 border-radius: 50%
-
-          .playing-lyric-wrapper
-            width: 80%
-            margin: 30px auto 0 auto
-            overflow: hidden
-            text-align: center
-            .playing-lyric
-              height: 20px
-              line-height: 20px
-              font-size: $font-size-medium
-              color: $color-text-l
-          .errorTip
-            height: 20px;
-            line-height: 20px;
-            margin-top: 9px;
-            text-align: center;
-            color: #ec971f;
-            font-size: 14px;
+          .text-wrapper
+            position: relative
+            width: 100%
+            height: calc(137 / 667 * 100vh)
+            .text
+              width: 80%
+              position: absolute
+              top: calc(50% - 25px)
+              left: 10%
+              overflow: hidden
+              text-align: center
+              .playing-lyric
+                height: 20px
+                line-height: 20px
+                font-size: $font-size-medium
+                color: $color-text-l
+              .errorTip
+                height: 20px;
+                line-height: 20px;
+                margin-top: 10px;
+                color: #ec971f;
+                font-size: $font-size-medium;
         .middle-r
           display: inline-block
           vertical-align: top
@@ -756,7 +781,7 @@
                 color: $color-text
       .bottom
         position: absolute
-        bottom: 50px
+        bottom: calc(25 / 667 * 100vh)
         width: 100%
         .dot-wrapper
           text-align: center
@@ -766,7 +791,7 @@
             vertical-align: middle
             margin: 0 4px
             width: 8px
-            height: 8px
+            height: calc(8 / 667 * 100vh)
             border-radius: 50%
             background: $color-text-l
             &.active
@@ -778,12 +803,12 @@
           align-items: center
           width: 80%
           margin: 0px auto
-          padding: 10px 0
+          padding: calc(10 / 667 * 100vh) 0
           .time
             color: $color-text
             font-size: $font-size-small
             flex: 0 0 30px
-            line-height: 30px
+            line-height: calc(30 / 667 * 100vh)
             width: 30px
             &.time-l
               text-align: left
@@ -800,14 +825,14 @@
             &.disable
               color: $color-theme-d
             i
-              font-size: 30px
+              font-size: calc(30 / 667 * 100vh)
           .i-left
             text-align: right
           .i-center
             padding: 0 20px
             text-align: center
             i
-              font-size: 40px
+              font-size: calc(40 / 667 * 100vh)
           .i-right
             text-align: left
           .icon-favorite
@@ -841,6 +866,8 @@
         width: 40px
         padding: 0 10px 0 20px
         img
+          width: 100%
+          height: 100%
           border-radius: 50%
           &.play
             animation: rotate 10s linear infinite
@@ -870,7 +897,7 @@
           font-size: 30px
           color: $color-theme-d
         .icon-mini
-          font-size: 32px
+          font-size: 30px
           position: absolute
           left: 0
           top: 0

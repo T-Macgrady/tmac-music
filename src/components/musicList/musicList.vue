@@ -1,14 +1,14 @@
 <template>
   <div class="music-list" :class="theme">
     <!--返回上一层-->
-    <div class="back" @click="back">
+    <div class="back" ref="back" @click="back">
       <i class="icon-back"></i>
     </div>
     <!--歌曲信息-->
-    <h1 class="title" v-html="title"></h1>
+    <h1 class="title" ref="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="play-wrapper">
-        <div ref="playBtn" v-show="songs.length" class="play" @click="random">
+        <div ref="playBtn" v-show="songs.length" class="play ignore border" @click="random">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -49,7 +49,6 @@
   import {mapActions} from 'vuex'
   import {playListMixin} from 'common/js/mixin'
 
-  const RESERVED_HEIGHT = 40
   const transform = prefixStyle('transform')
 
   export default {
@@ -88,8 +87,12 @@
     },
     // 计算获取背景图片高度 设置scroll的偏移值
     mounted() {
+      let title = this.$refs.title
+      this.reservedHeight = title.clientHeight
+      title.style.zIndex = 40
+      this.$refs.back.style.zIndex = 50
       this.imageHeight = this.$refs.bgImage.clientHeight
-      this.minTransalteY = -this.imageHeight + RESERVED_HEIGHT
+      this.minTransalteY = -this.imageHeight + this.reservedHeight
       this.$refs.list.$el.style.top = `${this.imageHeight}px`
     },
     methods: {
@@ -126,8 +129,8 @@
         let translateY = Math.max(this.minTransalteY, newVal)
         let scale = 1
         let zIndex = 0
-        const percent = Math.abs(newVal / this.imageHeight)
         if (newVal > 0) {
+          const percent = Math.abs(newVal / this.imageHeight)
           scale = 1 + percent
           zIndex = 10
         }
@@ -136,10 +139,10 @@
         if (newVal < this.minTransalteY) {
           zIndex = 10
           this.$refs.bgImage.style.paddingTop = 0
-          this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+          this.$refs.bgImage.style.height = `${this.reservedHeight}px`
           this.$refs.playBtn.style.display = 'none'
         } else {
-          this.$refs.bgImage.style.paddingTop = '70%'
+          this.$refs.bgImage.style.paddingTop = `${this.imageHeight}px`
           this.$refs.bgImage.style.height = 0
           this.$refs.playBtn.style.display = ''
         }
@@ -190,7 +193,8 @@
       position: relative
       width: 100%
       height: 0
-      padding-top: 70%
+      // padding-top: calc((70vw + 262.5 / 667 * 100vh) / 2)
+      padding-top: 0.6 * 100vmin
       transform-origin: top
       background-size: cover
       .play-wrapper
@@ -204,10 +208,11 @@
           padding: 7px 0
           margin: 0 auto
           text-align: center
-          border: 1px solid $color-theme
           color: $color-theme
-          border-radius: 100px
           font-size: 0
+          &.ignore.border::before
+            border-color: $color-theme
+            border-radius: 100px
           .icon-play
             display: inline-block
             vertical-align: middle

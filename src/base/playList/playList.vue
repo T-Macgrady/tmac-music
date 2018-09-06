@@ -1,6 +1,6 @@
 <template>
   <transition name="list-fade">
-    <div class="playlist" :class="theme" v-show="showFlag" @click="hide">
+    <div class="playlist" ref="playList" :class="theme" v-show="showFlag" @click="hide">
       <div class="list-wrapper" :class="theme" @click.stop>
         <div class="list-header">
           <h1 class="title">
@@ -37,7 +37,7 @@
           </transition-group>
         </scroll>
         <div class="list-operate">
-          <div class="add" @click="addSong">
+          <div class="add border ignore" @click="addSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
@@ -81,6 +81,9 @@
       modeText() {
         return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
       }
+    },
+    mounted() {
+      this.$refs.playList.style.zIndex = 200
     },
     methods: {
       ...mapActions([
@@ -191,7 +194,7 @@
               font-size: $font-size-medium
               color: $color-text-d
       .list-content
-        max-height: 240px
+        max-height: calc(240/667 * 100vh)
         overflow: hidden
         .item
           display: flex
@@ -231,9 +234,12 @@
           display: flex
           align-items: center
           padding: 8px 16px
-          border: 1px solid $color-text-l
-          border-radius: 100px
+          // border: 1px solid $color-text-l
+          // border-radius: 100px
           color: $color-text-l
+          &.ignore.border::before
+            border-color: $color-text-l
+            border-radius: 100px
           .icon-add
             margin-right: 5px
             font-size: $font-size-small-s
