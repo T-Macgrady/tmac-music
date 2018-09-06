@@ -4,15 +4,15 @@
       <div>
         <div class="slider">
           <div class="slider-wrapper" v-if="recommendList.length">
-        </div>
-          <slider>
-            <!--slot-->
-            <div v-for="item in recommendList" :key="item.key">
-              <a :href="item.linkUrl">
-                <img @load="loadImage" :src="item.picUrl" alt=""></img>
-              </a>
-            </div>
-          </slider>
+            <slider>
+              <!--slot-->
+              <div v-for="item in recommendList" :key="item.key">
+                <a :href="item.linkUrl">
+                  <img @load="loadImage" :src="item.picUrl" alt=""></img>
+                </a>
+              </div>
+            </slider>
+          </div>
         </div>
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
