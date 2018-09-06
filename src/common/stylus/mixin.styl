@@ -1,7 +1,7 @@
 // 背景图片
 bg-image($url)
   background-image: url($url + "@2x.png")
-  @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3)
+  @media (min--moz-device-pixel-ratio: 3), (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3), (min-resolution: 240dpi), (min-resolution: 2.5dppx)
     background-image: url($url + "@3x.png")
 
 // 不换行
@@ -30,4 +30,15 @@ extend-styles($prop, $variable, arg...)
   &.blue
     {$prop}: arg $variable[2]
   &.green
+    {$prop}: arg $variable[3]
+
+// 添加皮肤样式，带伪类before
+extend-styles-pseudo($prop, $variable, pseudo, arg...)
+  &.black::{pseudo}
+    {$prop}: arg $variable[0]
+  &.red::{pseudo}
+    {$prop}: arg $variable[1]
+  &.blue::{pseudo}
+    {$prop}: arg $variable[2]
+  &.green::{pseudo}
     {$prop}: arg $variable[3]

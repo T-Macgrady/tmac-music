@@ -2,7 +2,9 @@
   <div class="recommend" ref="recommend">
     <Scroll class="recommend-content" :data="discList" ref="scroll">
       <div>
-        <div class="slider-wrapper" v-if="recommendList.length">
+        <div class="slider">
+          <div class="slider-wrapper" v-if="recommendList.length">
+        </div>
           <slider>
             <!--slot-->
             <div v-for="item in recommendList" :key="item.key">
@@ -17,7 +19,7 @@
           <ul>
             <li v-for="item in discList" class="item" :key="item.key" @click="selectItem(item)">
               <div class="icon">
-                <img v-lazy="item.imgurl" width="60" height="60" alt="">
+                <img v-lazy="item.imgurl" alt="">
               </div>
               <div class="text">
                 <h2 class="name" v-html="item.creator.name"></h2>
@@ -104,15 +106,16 @@
 <style scoped lang="stylus">
   .recommend
     position: fixed
-    width: 100%
+    width: 100vw
     top: 88px
     bottom: 0
     .recommend-content
       height: 100%
       overflow: hidden
-      .slider-wrapper
+      .slider
         position: relative
-        width: 100%
+        width: 100vw
+        height: 40vw
         overflow: hidden
       .recommend-list
         .list-title
@@ -130,6 +133,9 @@
             flex: 0 0 60px
             width: 60px
             padding-right: 20px
+            img
+              width: 100%
+              height: 100%
           .text
             display: flex
             flex-direction: column

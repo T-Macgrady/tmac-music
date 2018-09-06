@@ -23,7 +23,7 @@
         return this.singer.name
       },
       bgImage() {
-        return this.singer.avatar
+        return this.singer.avatar300
       },
       ...mapGetters([
         'singer'
