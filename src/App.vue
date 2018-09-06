@@ -108,5 +108,11 @@
 </script>
 
 <style scoped lang="stylus">
-  
+  #app
+    overflow: hidden
+  img
+    width: 100%
+    height: auto
+    vertical-align: top
+    content: normal !important
 </style>

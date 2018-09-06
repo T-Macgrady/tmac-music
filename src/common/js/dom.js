@@ -64,3 +64,10 @@ export function getAnimationEnd() {
     }
   }
 }
+
+// 获取元素style
+export function getComputedStyle(el, property, boolean = false) {
+  return document.defaultView.getComputedStyle
+  ? document.defaultView.getComputedStyle(el, boolean)[property]
+  : el.currentStyle[property]
+}

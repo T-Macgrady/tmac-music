@@ -1,7 +1,7 @@
 <template>
   <transition name="list-fade">
-    <div class="playlist" ref="playList" :class="theme" v-show="showFlag" @click="hide">
-      <div class="list-wrapper" :class="theme" @click.stop>
+    <div class="playlist" v-show="showFlag" @click="hide">
+      <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">
             <i class="icon" :class="iconMode" @click="changeMode"></i>
@@ -37,12 +37,12 @@
           </transition-group>
         </scroll>
         <div class="list-operate">
-          <div class="add border ignore" @click="addSong">
+          <div class="add" @click="addSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
         </div>
-        <div class="list-close" :class="theme" @click="hide()">
+        <div class="list-close" @click="hide()">
           <span>关闭</span>
         </div>
       </div>
@@ -82,9 +82,6 @@
         return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
       }
     },
-    mounted() {
-      this.$refs.playList.style.zIndex = 200
-    },
     methods: {
       ...mapActions([
         'deleteSong',
@@ -99,7 +96,7 @@
         setTimeout(() => {
           this.$refs.listContent.refresh()
           this.scrollToCurrent(this.currentSong)
-        }, 50)
+        }, 20)
       },
       hide() {
         this.showFlag = false
@@ -151,6 +148,9 @@
   }
 </script>
 <style scoped lang="stylus">
+  @import "~common/stylus/variable"
+  @import "~common/stylus/mixin"
+
   .playlist
     position: fixed
     left: 0
@@ -158,11 +158,11 @@
     top: 0
     bottom: 0
     z-index: 200
-    extend-styles(background-color, $color-background-d)
+    background-color: $color-background-d
     &.list-fade-enter-active, &.list-fade-leave-active
-      transition: opacity .2s
+      transition: opacity 0.3s
       .list-wrapper
-        transition: all .2s
+        transition: all 0.3s
     &.list-fade-enter, &.list-fade-leave-to
       opacity: 0
       .list-wrapper
@@ -173,7 +173,7 @@
       left: 0
       bottom: 0
       width: 100%
-      extend-styles(background, $color-highlight-background)
+      background-color: $color-highlight-background
       .list-header
         position: relative
         padding: 20px 30px 10px 20px
@@ -194,7 +194,7 @@
               font-size: $font-size-medium
               color: $color-text-d
       .list-content
-        max-height: calc(240/667 * 100vh)
+        max-height: 240px
         overflow: hidden
         .item
           display: flex
@@ -234,12 +234,9 @@
           display: flex
           align-items: center
           padding: 8px 16px
-          // border: 1px solid $color-text-l
-          // border-radius: 100px
+          border: 1px solid $color-text-l
+          border-radius: 100px
           color: $color-text-l
-          &.ignore.border::before
-            border-color: $color-text-l
-            border-radius: 100px
           .icon-add
             margin-right: 5px
             font-size: $font-size-small-s
@@ -248,7 +245,7 @@
       .list-close
         text-align: center
         line-height: 50px
-        extend-styles(background, $color-background)
+        background: $color-background
         font-size: $font-size-medium-x
         color: $color-text-l
 </style>

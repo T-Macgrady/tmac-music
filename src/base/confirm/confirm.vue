@@ -5,8 +5,8 @@
         <div class="confirm-content" :class="theme">
           <p class="text">{{text}}</p>
           <div class="operate">
-            <div @click="cancel" class="operate-btn left" :class="theme">{{cancelBtnText}}</div>
-            <div @click="confirm" class="operate-btn" :class="theme">{{confirmBtnText}}</div>
+            <div @click="cancel" class="operate-btn left border-topright" :class="theme">{{cancelBtnText}}</div>
+            <div @click="confirm" class="operate-btn right border-top" :class="theme">{{confirmBtnText}}</div>
           </div>
         </div>
       </div>
@@ -92,11 +92,32 @@
             flex: 1
             line-height: 22px
             padding: 10px 0
-            extend-styles(border-top, $color-background-d, 1px, solid)
             color: $color-text-d
             &.left
-              extend-styles(border-right, $color-background-d, 1px, solid)
-              
+              &.border-topright
+                extend-styles-pseudo(border-color, $color-background-d, before)
+                extend-styles-pseudo(border-color, $color-background-d, after)
+            &.right
+              &.border-top
+                extend-styles-pseudo(border-color, $color-background-d, before)
+            // &.black
+            //   background: $color-background-d-black svg(square param(--color #383838))
+            // &.red
+            //   background: $color-background-d-red svg(square param(--color #c1684c))
+            // &.blue
+            //   background: $color-background-d-blue svg(square param(--color #5346a1))
+            // &.green
+            //   background: $color-background-d-green svg(square param(--color #36a366))
+            // // extend-styles(border-top, $color-background-d, 1px, solid)
+            // color: $color-text-d
+            // &.left
+              // extend-styles(border-right, $color-background-d, 1px, solid)
+
+  // @svg square
+  //   @rect
+  //     fill: var(--color, black)
+  //     width: 100%
+      // height: 100%
 
   @keyframes confirm-fadein
     0%

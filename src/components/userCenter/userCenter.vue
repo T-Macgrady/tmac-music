@@ -12,7 +12,7 @@
         >
         </switches>
       </div>
-      <div ref="playBtn" class="play-btn" @click="random">
+      <div ref="playBtn" class="play-btn ignore border" @click="random">
         <i class="icon-play"></i>
         <span class="text">随机播放全部</span>
       </div>
@@ -152,10 +152,11 @@
       padding: 7px 0
       margin: 0 auto
       text-align: center
-      border: 1px solid  $color-text-l
       color: $color-text-l
-      border-radius: 100px
       font-size: 0
+      &.ignore.border::before
+        border-color: $color-text-l
+        border-radius: 100px
       .icon-play
         display: inline-block
         vertical-align: middle

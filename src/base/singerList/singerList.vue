@@ -12,7 +12,7 @@
         <h2 class="list-group-title" :class="theme"> {{group.title}} </h2>
         <ul>
           <li @click="selectItem(item)" class="list-group-item" v-for="item in group.items" :key="item.key">
-            <img v-lazy="item.avatar" alt="" class="avatar">
+            <img v-lazy="item.avatar150" alt="" class="avatar">
             <span class="name"> {{item.name}} </span>
           </li>
         </ul>
@@ -212,16 +212,16 @@
       top: 50%
       transform: translateY(-50%)
       width: 20px
-      padding: 20px 0
+      padding: calc(20 / 667 * 100vh) 0
       border-radius: 10px
       text-align: center
       extend-styles(background, $color-background-d)
       font-family: Helvetica
       .item
-        padding: 3px
+        padding: calc(3 / 667 * 100vh)
         line-height: 1
         color: $color-text-l
-        font-size: $font-size-small
+        font-size: calc(12 / 667 * 100vh)
         &.current
           color: $color-theme
     .list-fixed
