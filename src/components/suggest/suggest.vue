@@ -8,7 +8,7 @@
     @beforeScroll="listScroll"
     ref="suggest"
   >
-    <ul class="suggest-list">
+    <ul class="suggest-list" ref="scrollWrapper">
       <li 
         class="suggest-item"
         v-for="item in result"
@@ -171,7 +171,7 @@
         }
       },
       clearScrollStyle() {
-        const style = this.$refs.suggest.style
+        const style = this.$refs.scrollWrapper.style
         style.transform = style.transform.replace('translateZ(0px)', '')
       }
     }

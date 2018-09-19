@@ -2,12 +2,12 @@
 * @Author: Lizhhmac
 * @Date:   2018-09-12 18:13:52
 * @Last Modified by:   Lizhhmac
-* @Last Modified time: 2018-09-19 17:26:24
+* @Last Modified time: 2018-09-20 00:14:30
 */
 import { oneRun } from 'common/js/util'
 export default function testAudioPlay() {
   let audio = document.querySelector('#audio')
-  audio.src = '/static/test.m4a'
+  audio.src = '/tmac-music/dist/static/test.m4a'
   try {
     audio.play().catch(e => {
       console.log(e)
