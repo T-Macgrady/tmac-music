@@ -4,15 +4,25 @@
   </transition>
 </template>
 <script>
-  import { mapGetters } from 'vuex'
   import { getSingerDetail } from 'api/singer'
+  import { mapGetters } from 'vuex'
   import { ERR_OK } from 'api/config'
   import { createSongs } from 'common/js/song'
+  import Singer from 'common/js/singer'
   import MusicList from 'components/musicList/musicList'
+
   export default {
+    props: {
+      id: String
+    },
     data() {
       return {
-        songs: []
+        songs: [],
+        subSinger: {
+          id: '',
+          name: '',
+          avatar300: ''
+        }
       }
     },
     components: {
@@ -20,28 +30,32 @@
     },
     computed: {
       title() {
-        return this.singer.name
+        return (this.singer.id !== undefined && this.singer.id === this.id)
+        ? this.singer.name
+        : this.subSinger.name
       },
       bgImage() {
-        return this.singer.avatar300
+        return (this.singer.id !== undefined && this.singer.id === this.id)
+        ? this.singer.avatar300
+        : this.subSinger.avatar300
       },
-      ...mapGetters([
-        'singer'
-      ])
+      ...mapGetters(['singer'])
     },
     created() {
       this._getDetail()
     },
     methods: {
       _getDetail() {
-        // 刷新当前页回退到singer
-        if (!this.singer.id) {
-          this.$router.push('/singer')
-        }
         let that = this
-        getSingerDetail(this.singer.id).then(res => {
+        getSingerDetail(this.id).then(res => {
           if (res.code === ERR_OK) {
             createSongs(res.data.list, 'singer', that)
+            if (this.singer.id === undefined || this.singer.id !== this.id) {
+              this.subSinger = new Singer({
+                id: this.id,
+                name: res.data.singer_name
+              })
+            }
           }
         })
       }
@@ -49,8 +63,12 @@
   }
 </script>
 <style lang="stylus" scoped>
-  .slide-enter-active,.slide-leave-active
-    transition: all 0.3s
-  .slide-enter,.slide-leave-to
+  .slide-enter-active
+    transition: all .2s
+  .slide-leave-active
+    transition: all .1s
+  .slide-enter
     transform: translate3d(100%, 0, 0)
+  .slide-leave-to
+    transform: translate3d(-100%, 0, 0)
 </style>

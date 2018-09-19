@@ -100,7 +100,7 @@
 </script>
 <style lang="stylus">
   .singer
-    position: fixed
+    position: absolute
     top: 88px
     bottom: 0
     width: 100%

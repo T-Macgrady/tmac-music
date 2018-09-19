@@ -22,6 +22,9 @@ const mutations = {
   [types.SET_CURRENT_INDEX](state, index) {
     state.currentIndex = index
   },
+  [types.SET_SONGS](state, songs) {
+    state.songs = songs
+  },
   [types.SET_DISC](state, disc) {
     state.disc = disc
   },
@@ -39,6 +42,15 @@ const mutations = {
   },
   [types.SET_THEME](state, theme) {
     state.theme = theme
+  },
+  [types.SET_BGIMG_URL](state, bgImgUrl) {
+    state.bgImgUrl = bgImgUrl
+  },
+  [types.SET_OPACITY](state, opacity) {
+    state.opacity = opacity
+  },
+  [types.SET_TIPSHOW](state, tipShow) {
+    state.tipShow = tipShow
   }
 }
 

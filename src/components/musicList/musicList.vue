@@ -1,21 +1,5 @@
 <template>
   <div class="music-list" :class="theme">
-    <!--返回上一层-->
-    <div class="back" ref="back" @click="back">
-      <i class="icon-back"></i>
-    </div>
-    <!--歌曲信息-->
-    <h1 class="title" ref="title" v-html="title"></h1>
-    <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div class="play-wrapper">
-        <div ref="playBtn" v-show="songs.length" class="play ignore border" @click="random">
-          <i class="icon-play"></i>
-          <span class="text">随机播放全部</span>
-        </div>
-      </div>
-    </div>
-    <!--滑动辅助层-->
-    <div class="bg-layer" :class="theme" ref="layer"></div>
     <!--歌曲列表-->
     <scroll :data="songs"
       @scroll="scroll"
@@ -25,7 +9,7 @@
       :class="theme"
       ref="list"
     >
-      <div class="song-list-wrapper">
+      <div class="song-list-wrapper" ref="scrollWrapper">
         <song-list
           :songs="songs"
           :rank="rank"
@@ -38,6 +22,31 @@
         <loading></loading>
       </div>
     </scroll>
+    <div class="bg-image"
+      :style="bgStyle"
+      ref="bgImage"
+      @touchstart="bgTouchStart"
+      @touchend="bgTouchEnd"
+    >
+    </div>
+    <!--歌曲信息-->
+    <h1 class="title" ref="title" v-html="title"></h1>
+    <!--返回上一层-->
+    <div class="back" ref="back" @click="back">
+      <i class="icon-back"></i>
+    </div>
+    <div class="play-wrapper">
+      <div ref="playBtn" v-show="songs.length" class="play ignore border" @click="random">
+        <i class="icon-play"></i>
+        <span class="text">随机播放全部</span>
+      </div>
+    </div>
+    <transition name="tip">
+      <div v-show="showTip" ref="tipIcon" class="tip-icon">
+        <i class="icon-tape"></i>
+        <p class="note">长按换背景</p>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -45,21 +54,22 @@
   import Scroll from 'base/scroll'
   import Loading from 'base/loading'
   import SongList from 'base/songList/songList'
-  import {prefixStyle} from 'common/js/dom'
-  import {mapActions} from 'vuex'
-  import {playListMixin} from 'common/js/mixin'
-
+  import {prefixStyle, getAnimationEnd} from 'common/js/dom'
+  import {mapActions, mapMutations, mapGetters} from 'vuex'
+  import {playListMixin, setBgImgMixin} from 'common/js/mixin'
+  const animationend = getAnimationEnd()
   const transform = prefixStyle('transform')
 
   export default {
-    mixins: [playListMixin],
+    mixins: [playListMixin, setBgImgMixin],
     props: {
       bgImage: {
         type: String,
         default: ''
       },
       songs: {
-        type: Array
+        type: Array,
+        default: []
       },
       title: {
         type: String,
@@ -72,33 +82,48 @@
     },
     data() {
       return {
-        scrollY: 0
+        scrollY: 0,
+        showTip: false
       }
     },
     computed: {
       // 加载歌手背景图片
       bgStyle() {
         return `background-image:url(${this.bgImage})`
-      }
+      },
+      ...mapGetters(['tipShow'])
     },
     created() {
       this.probeType = 3
       this.listenScroll = true
+      this.one = true
+      this.hidePlayBtn = true
     },
-    // 计算获取背景图片高度 设置scroll的偏移值
-    mounted() {
-      let title = this.$refs.title
-      this.reservedHeight = title.clientHeight
-      title.style.zIndex = 40
-      this.$refs.back.style.zIndex = 50
-      this.imageHeight = this.$refs.bgImage.clientHeight
-      this.minTransalteY = -this.imageHeight + this.reservedHeight
-      this.$refs.list.$el.style.top = `${this.imageHeight}px`
+    updated() {
+      if (!this.one) return
+      setTimeout(() => {
+        if (this.tipShow) {
+          this.one = false
+          this.showTip = true
+          this.$refs.tipIcon.addEventListener(animationend, () => {
+            if (this.showTip) {
+              this.setTipShow(false)
+              this.showTip = false
+            }
+          }, {once: true})
+          setTimeout(() => {
+            if (this.showTip) {
+              this.setTipShow(false)
+              this.showTip = false
+            }
+          }, 4500)
+        }
+      }, 500)
     },
     methods: {
       // 当底部出现mini播放器的时候 重新计算高度
       handlePlayList(playlist) {
-        const bottom = playlist.length > 0 ? '60px' : ''
+        const bottom = playlist.length > 0 ? '16vw' : ''
         this.$refs.list.$el.style.bottom = bottom
         this.$refs.list.refresh()
       },
@@ -106,49 +131,68 @@
         this.scrollY = pos.y
       },
       back() {
-        this.$router.back()
+        this.$router.push(this.$router.history.current.matched[0].path)
       },
       selectItem(item, index) {
         this.selectPlay({
           list: this.songs,
           index
         })
+        this.$nextTick(() => {
+          this.clearScrollStyle()
+          this.clearTipIcon()
+        })
       },
       random() {
         this.randomPlay({
           list: this.songs
         })
+        this.$nextTick(() => {
+          this.clearScrollStyle()
+          this.clearTipIcon()
+        })
+      },
+      clearTipIcon() {
+        if (this.showTip) {
+          this.setTipShow(false)
+          this.$refs.tipIcon.style.display = 'none'
+        }
+      },
+      clearScrollStyle() {
+        const style = this.$refs.scrollWrapper.style
+        style.transform = style.transform.replace('translateZ(0px)', '')
       },
       ...mapActions([
         'selectPlay',
         'randomPlay'
-      ])
+      ]),
+      ...mapMutations({
+        setTipShow: 'SET_TIPSHOW'
+      })
     },
     watch: {
       scrollY(newVal) {
-        let translateY = Math.max(this.minTransalteY, newVal)
-        let scale = 1
-        let zIndex = 0
-        if (newVal > 0) {
-          const percent = Math.abs(newVal / this.imageHeight)
-          scale = 1 + percent
-          zIndex = 10
-        }
-
-        this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
-        if (newVal < this.minTransalteY) {
-          zIndex = 10
-          this.$refs.bgImage.style.paddingTop = 0
-          this.$refs.bgImage.style.height = `${this.reservedHeight}px`
-          this.$refs.playBtn.style.display = 'none'
+        const imageHeight = Math.min(window.innerWidth, window.innerHeight) * 0.6
+        const reservedHeight = window.innerWidth * 40 / 375
+        const percent = Math.abs(newVal / imageHeight)
+        if (newVal <= 0) {
+          this.showTip && (this.showTip = false)
+          let scrollImageHeight = Math.max(reservedHeight, newVal + imageHeight)
+          this.$refs.bgImage.style.height = `${scrollImageHeight}px`
+          // this.$refs.playBtn.style.opacity = Math.max(0, 1 - percent)
+          if (this.hidePlayBtn && newVal < (-imageHeight / 12)) {
+            this.$refs.playBtn.style.visibility = 'hidden'
+            this.hidePlayBtn = false
+          }
         } else {
-          this.$refs.bgImage.style.paddingTop = `${this.imageHeight}px`
-          this.$refs.bgImage.style.height = 0
-          this.$refs.playBtn.style.display = ''
+          const scale = 1 + percent
+          this.$refs.bgImage.style[transform] = `scale(${scale})`
+          this.$refs.bgImage.style.height = imageHeight
+          if (!this.hidePlayBtn) {
+            this.$refs.playBtn.style.visibility = 'visible'
+            this.hidePlayBtn = true
+          }
         }
-        // 下拉背景图片伸缩
-        this.$refs.bgImage.style[transform] = `scale(${scale})`
-        this.$refs.bgImage.style.zIndex = zIndex
       }
     },
     components: {
@@ -162,27 +206,24 @@
 <style scoped lang="stylus" rel="stylesheet/stylus">
   .music-list
     position: fixed
-    z-index: 100
+    z-index: 2
     top: 0
     left: 0
     bottom: 0
     right: 0
-    extend-styles('background', $color-background)
     .back
       position absolute
       top: 0
       left: 6px
-      z-index: 50
       .icon-back
         display: block
-        padding: 10px
+        padding: 9px
         font-size: $font-size-large-x
         color: $color-theme
     .title
       position: absolute
       top: 0
       left: 10%
-      z-index: 40
       width: 80%
       no-wrap()
       text-align: center
@@ -192,53 +233,53 @@
     .bg-image
       position: relative
       width: 100%
-      height: 0
-      // padding-top: calc((70vw + 262.5 / 667 * 100vh) / 2)
-      padding-top: 0.6 * 100vmin
+      height: 0.6 * 100vmin
       transform-origin: top
+      transform: scale3d(1,1,1)
       background-size: cover
-      .play-wrapper
-        position: absolute
-        bottom: 20px
-        z-index: 50
-        width: 100%
-        .play
-          box-sizing: border-box
-          width: 135px
-          padding: 7px 0
-          margin: 0 auto
-          text-align: center
-          color: $color-theme
-          font-size: 0
-          &.ignore.border::before
-            border-color: $color-theme
-            border-radius: 100px
-          .icon-play
-            display: inline-block
-            vertical-align: middle
-            margin-right: 6px
-            font-size: $font-size-medium-x
-          .text
-            display: inline-block
-            vertical-align: middle
-            font-size: $font-size-small
-      .filter
-        position: absolute
-        top: 0
-        left: 0
-        width: 100%
-        height: 100%
-        background: rgba(7, 17, 27, 0.4)
-    .bg-layer
-      position: relative
-      height: 100%
-      extend-styles(background, $color-background)
+    .tip-icon
+      box-sizing: border-box
+      position: absolute
+      top: 0.9 * 0.6 * 100vmin
+      left: 70%
+      text-align: center
+      font-weight: 900
+      color: #ffcd32
+      transform-origin: center
+      .icon-tape
+        font-size: 40px
+      .note
+        margin-top: 4px
+    .play-wrapper
+      position: absolute
+      top: calc(0.6 * 100vmin - 50px)
+      z-index: 1
+      width: 100%
+      .play
+        box-sizing: border-box
+        width: 135px
+        padding: 7px 0
+        margin: 0 auto
+        text-align: center
+        color: $color-theme
+        font-size: 0
+        &.ignore.border::before
+          border-color: $color-theme
+          border-radius: 100px
+        .icon-play
+          display: inline-block
+          vertical-align: middle
+          margin-right: 6px
+          font-size: $font-size-medium-x
+        .text
+          display: inline-block
+          vertical-align: middle
+          font-size: $font-size-small
     .list
-      position: fixed
-      top: 0
+      position: absolute
+      top: 0.6 * 100vmin
       bottom: 0
       width: 100%
-      extend-styles(background, $color-background)
       .song-list-wrapper
         padding: 20px 30px
       .loading-container

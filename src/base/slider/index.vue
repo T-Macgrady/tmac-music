@@ -127,6 +127,16 @@
         this.timer = setTimeout(() => {
           this.slider.goToPage(pageIndex, 0, 400)
         }, this.interval)
+      },
+      clearScrollStyle() {
+        if (this.autoPlay) {
+          clearTimeout(this.timer)
+        }
+        const style = this.$refs.sliderGroup.style
+        style.transform = style.transform.replace('translateZ(0px)', '')
+      },
+      playSlide() {
+        this.play()
       }
     },
     destroyed() {
@@ -140,7 +150,6 @@
   .slider
     min-height: 1px
     .slider-group
-      position: relative
       overflow: hidden
       white-space: nowrap
       .slider-item

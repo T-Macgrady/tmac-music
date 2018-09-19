@@ -51,7 +51,7 @@ const UserCenter = resolve => {
   })
 }
 
-export default new Router({
+let router = new Router({
   routes: [{
     path: '/',
     redirect: '/recommend',
@@ -59,20 +59,25 @@ export default new Router({
   }, {
     path: '/recommend',
     component: Recommend,
+    name: 'recommend',
     children: [{
       path: '/recommend/:id',
-      component: RecommendDetail
+      component: RecommendDetail,
+      props: true
     }]
   }, {
     path: '/singer',
     component: Singer,
+    name: 'singer',
     children: [{
       path: '/singer/:id',
-      component: SingerDetail
+      component: SingerDetail,
+      props: true
     }]
   }, {
     path: '/search',
     component: Search,
+    name: 'search',
     children: [{
       path: '/search/:id',
       component: SingerDetail
@@ -81,9 +86,11 @@ export default new Router({
   }, {
     path: '/rank',
     component: Rank,
+    name: 'rank',
     children: [{
       path: '/rank/:id',
-      component: RankDetail
+      component: RankDetail,
+      props: true
     }]
   }, {
     path: '/user',
@@ -96,3 +103,35 @@ export default new Router({
     }
   }
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.name === undefined) {
+    const delay = to.path === '/user' ? 50 : 200
+    setTimeout(() => {
+      document.querySelector('.bgColor').style.zIndex = '1'
+    }, delay)
+  }
+  next()
+  // if (from.path === '/' && to.params.id !== undefined) {
+  //   const names = {
+  //     singer: 'SET_SINGER',
+  //     recommend: 'SET_DISC',
+  //     rank: 'SET_TOP_LIST'
+  //   }
+  //   const target = to.path.match(/^\/(\w+)\//)[1]
+  //   Object.keys(names).some(name => {
+  //     if (target === name) {
+  //       store.commit(names[name], to.params.id)
+  //       return true
+  //     }
+  //   })
+  // }
+})
+router.afterEach((to, from, next) => {
+  if (from.name === undefined) {
+    setTimeout(() => {
+      document.querySelector('.bgColor').style.zIndex = '-1'
+    }, 150)
+  }
+})
+export default router

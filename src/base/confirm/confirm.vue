@@ -76,7 +76,7 @@
       .confirm-content
         width: 270px
         border-radius: 13px
-        extend-styles(background, $color-highlight-background)
+        extend-styles(background, $color-highlight-background-op1)
         .text
           padding: 19px 15px
           line-height: 22px

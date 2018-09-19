@@ -37,7 +37,7 @@
     data() {
       return {
         offsetWidth: 0,
-        barWidth: 0
+        clientWidth: window.innerWidth
       }
     },
     computed: {
@@ -49,22 +49,22 @@
       progStyle() {
         return {
           // width: `${this.offsetWidth}px`
-          transform: `scaleX(${this.progressScale})`
+          transform: `scale3d(${this.progressScale}, 1, 1)`
         }
       },
       btnStyle() {
         return {
           transform: `translate3d(${this.offsetWidth}px, 0, 0)`
         }
+      },
+      barWidth() {
+        return 240 / 375 * this.clientWidth - 16 / 375 * this.clientWidth
       }
     },
     watch: {
       // 监测父组件随时间变化的percent，设置进度动画样式
       percent(newVal) {
         this.setProgressOffset(newVal)
-        // 除去BTN宽度后的进度条长度
-        if (this.barWidth) return
-        this.getBarWidth()
       }
     },
     created() {
@@ -72,16 +72,12 @@
     },
     // 监听横竖屏，获取度条长度
     mounted() {
-      this.debounceGetBarWidth = throttle(() => {
-        this.getBarWidth()
+      const throttleGetBarWidth = throttle(() => {
+        this.clientWidth = window.innerWidth
       }, 50)
-      window.addEventListener('resize', this.debounceGetBarWidth)
+      window.addEventListener('resize', throttleGetBarWidth)
     },
     methods: {
-      getBarWidth() {
-        if (!this.fullScreen) return
-        this.barWidth = this.$refs.progressBar.clientWidth - this.$refs.progressBtn.offsetWidth
-      },
       // 进度条拖动效果
       progressTouchStart(e) {
         if (this.audioError || !this.songReady) return
@@ -128,17 +124,20 @@
     height: 30px
     .bar-inner
       position: relative
+      // z-index: 1
       top: 13px
       height: 4px
       background: rgba(0, 0, 0, 0.3)
       .progress
         position: absolute
+        z-index: 1
         height: 100%
         width: 100%
         transform-origin: left
         background: $color-theme
       .progress-btn-wrapper
         position: absolute
+        z-index: 2
         left: -8px
         top: -13px
         width: 30px

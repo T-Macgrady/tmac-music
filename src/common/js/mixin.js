@@ -8,13 +8,14 @@ export const playListMixin = {
     ])
   },
   mounted() {
+    if (!this.playList.length) return
     this.handlePlayList(this.playList)
   },
   activated() {
     this.handlePlayList(this.playList)
   },
   watch: {
-    playlist(newVal) {
+    playList(newVal) {
       this.handlePlayList(newVal)
     }
   },
@@ -120,5 +121,42 @@ export const searchMixin = {
       'saveSearchHistory',
       'deleteSearchHistory'
     ])
+  }
+}
+
+// 切换opacity，展示背景--父组件
+// export const opacityMixin = {
+//   computed: {
+//     opacityStyle() {
+//       return {
+//         opacity: this.opacity,
+//         transition: 'opacity .1s'
+//       }
+//     },
+//     ...mapGetters(['opacity'])
+//   }
+// }
+
+// 长按1s设置为主页背景图片
+export const setBgImgMixin = {
+  mounted() {
+    this.bgTouch = {}
+  },
+  methods: {
+    bgTouchStart(e) {
+      this.bgTouch.start = true
+      setTimeout(this.setBgImg, 1000, e)
+    },
+    bgTouchEnd(e) {
+      if (!this.bgTouch.start) return
+      this.bgTouch.start = false
+    },
+    setBgImg(e) {
+      if (!this.bgTouch.start) return
+      e.preventDefault()
+      this.setBgImgUrl(this.bgImage)
+      this.bgTouch.start = false
+    },
+    ...mapActions(['setBgImgUrl'])
   }
 }

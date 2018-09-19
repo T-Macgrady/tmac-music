@@ -153,7 +153,7 @@
     bottom: 0
     width: 100%
     z-index: 200
-    extend-styles(background, $color-background)
+    extend-styles(background, $color-background-op1)
     &.slide-enter-active, &.slide-leave-active
       transition: all 0.3s
     &.slide-enter, &.slide-leave-to

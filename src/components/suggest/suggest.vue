@@ -169,6 +169,10 @@
         if (data.song) {
           createSongs(list, 'searh', this)
         }
+      },
+      clearScrollStyle() {
+        const style = this.$refs.suggest.style
+        style.transform = style.transform.replace('translateZ(0px)', '')
       }
     }
   }

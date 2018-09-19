@@ -32,7 +32,7 @@ export function oneRun(fn) {
 
 // 去抖
 export function debounce(fn, delay) {
-  let timer
+  let timer = null
   return function(...args) {
     if (timer) {
       clearTimeout(timer)
@@ -46,7 +46,7 @@ export function debounce(fn, delay) {
 
 // 截流
 export function throttle(fn, delay) {
-  let timer
+  let timer = null
   return function(...args) {
     if (timer) return
     timer = setTimeout(() => {

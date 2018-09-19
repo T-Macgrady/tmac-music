@@ -11,10 +11,17 @@
   import { createSongs } from 'common/js/song'
 
   export default {
+    props: {
+      id: String
+    },
     data() {
       return {
         songs: [],
-        rank: true
+        rank: true,
+        subTopList: {
+          topTitle: '',
+          picUrl: ''
+        }
       }
     },
     components: {
@@ -25,10 +32,14 @@
         'topList'
       ]),
       title() {
-        return this.topList.topTitle
+        return (this.topList.id !== undefined && this.topList.id === this.id)
+        ? this.topList.topTitle
+        : this.subTopList.topTitle
       },
       bgImage() {
-        return this.topList.picUrl
+        return (this.topList.id !== undefined && this.topList.id === this.id)
+        ? this.topList.picUrl
+        : this.subTopList.picUrl
       }
     },
     created() {
@@ -36,14 +47,14 @@
     },
     methods: {
       _getTopListDetail() {
-        if (!this.topList.id) {
-          this.$router.push('/rank')
-          return
-        }
         let that = this
-        getTopListDetail(this.topList.id).then(res => {
+        getTopListDetail(this.id).then(res => {
           if (res.code === ERR_OK) {
             createSongs(res.songlist, 'rank', that)
+            if (this.topList.id === undefined || this.topList.id !== this.id) {
+              this.subTopList.topTitle = res.topinfo.ListName
+              this.subTopList.picUrl = res.topinfo.pic_v12
+            }
           }
         })
       }
@@ -51,9 +62,12 @@
   }
 </script>
 <style scoped lang="stylus">
-  .slide-enter-active, .slide-leave-active
-    transition: all 0.3s
-
-  .slide-enter, .slide-leave-to
+  .slide-enter-active
+    transition: all .2s
+  .slide-leave-active
+    transition: all .1s
+  .slide-enter
     transform: translate3d(100%, 0, 0)
+  .slide-leave-to
+    transform: translate3d(-100%, 0, 0)
 </style>

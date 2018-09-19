@@ -18,12 +18,12 @@
       </div>
       <div class="list-wrapper" ref="listWrapper">
         <scroll ref="favoriteList" class="list-scroll" v-if="currentIndex===0" :data="favoriteList">
-          <div class="list-inner">
+          <div class="list-inner" ref="scrollWrapper">
             <song-list :songs="favoriteList" @select="selectSong"></song-list>
           </div>
         </scroll>
         <scroll ref="playList" class="list-scroll" v-if="currentIndex===1" :data="playHistory">
-          <div class="list-inner">
+          <div class="list-inner" ref="scrollWrapper">
             <song-list :songs="playHistory" @select="selectSong"></song-list>
           </div>
         </scroll>
@@ -91,6 +91,10 @@
       },
       selectSong(song) {
         this.insertSong(new Song(song))
+        this.$nextTick(() => {
+          const style = this.$refs.scrollWrapper.style
+          style.transform = style.transform.replace('translateZ(0px)', '')
+        })
       },
       back() {
         this.$router.back()
@@ -106,6 +110,10 @@
         })
         this.randomPlay({
           list
+        })
+        this.$nextTick(() => {
+          const style = this.$refs.scrollWrapper.style
+          style.transform = style.transform.replace('translateZ(0px)', '')
         })
       },
       ...mapActions([
@@ -123,25 +131,28 @@
 </script>
 
 <style scoped lang="stylus">
+  .slide-enter-active
+    transition: all .2s
+  .slide-leave-active
+    transition: all .1s
+  .slide-enter
+    transform: translate3d(100%, 0, 0)
+  .slide-leave-to
+    transform: translate3d(-100%, 0, 0)
   .user-center
-    position: fixed
+    position: absolute
+    z-index: 1
+    z-index: 2
     top: 0
     bottom: 0
-    z-index: 100
     width: 100%
-    extend-styles(background, $color-background)
-    &.slide-enter-active, &.slide-leave-active
-      transition: all 0.3s
-    &.slide-enter, &.slide-leave-to
-      transform: translate3d(100%, 0, 0)
     .back
       position absolute
       top: 0
       left: 6px
-      z-index: 50
       .icon-back
         display: block
-        padding: 10px
+        padding: 15px
         font-size: $font-size-large-x
         color: $color-theme
     .switches-wrapper
@@ -174,7 +185,7 @@
       .list-scroll
         height: 100%
         overflow: hidden
-        .list-inner
+        .list-inner    
           padding: 20px 30px
     .no-result-wrapper
       position: absolute

@@ -1,13 +1,12 @@
 <template>
   <scroll class="list-view" 
-    :class="theme" 
     :data="data" 
     ref="listView"
     :listenScroll="listenScroll"
     :probeType="probeType"
     @scroll="scroll"
   >
-    <ul>
+    <ul ref="scrollWrapper">
       <li v-for="group in data" class="list-group" :key="group.key" ref="listGroup">
         <h2 class="list-group-title" :class="theme"> {{group.title}} </h2>
         <ul>
@@ -18,6 +17,12 @@
         </ul>
       </li>
     </ul>
+    <div class="loading-container" v-show="!data.length">
+      <loading></loading>
+    </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+      <h1 class="fixed-title" :class="theme"> {{fixedTitle}} </h1>
+    </div>
     
     <!--右侧快速定位列表-->
     <div class="list-shortcut" :class="theme" @touchstart="onShortcutTouchStart" @touchmove.stop.prevent="onShortcutTouchMove">
@@ -31,21 +36,14 @@
         </li>
       </ul>
     </div>
-    <div class="loading-container" v-show="!data.length">
-      <loading></loading>
-    </div>
-    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
-      <h1 class="fixed-title" :class="theme"> {{fixedTitle}} </h1>
-    </div>
   </scroll>
 </template>
 <script>
   import Scroll from 'base/scroll'
   import Loading from 'base/loading'
+  import { debounce } from 'common/js/util'
   import { getData } from 'common/js/dom'
 
-  const ANCHOR_HEIGHT = 18
-  const TITLE_HEIGHT = 30
   export default {
     created() {
       this.touch = {}
@@ -57,7 +55,11 @@
       return {
         scrollY: -1,
         currentIndex: 0,
-        diff: -1
+        diff: -1,
+        client: {
+          width: window.innerWidth,
+          height: window.innerHeight
+        }
       }
     },
     props: {
@@ -75,7 +77,23 @@
       fixedTitle() {
         if (this.scrollY > 0) return
         return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
+      },
+      anchorHeight() {
+        return 18 / 667 * this.client.height
+      },
+      titleHeight() {
+        return 30 / 375 * this.client.width
       }
+    },
+    mounted() {
+      window.addEventListener('resize', debounce(() => {
+        // clientWidth/Height校准
+        this.client = {
+          width: window.innerWidth,
+          height: window.innerHeight
+        }
+        this.calcHeight()
+      }, 200))
     },
     components: {
       Scroll,
@@ -112,10 +130,8 @@
         this.currentIndex = listHeight.length - 2
       },
       diff(newVal) {
-        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
-        if (this.fixedTop === fixedTop) {
-          return
-        }
+        let fixedTop = (newVal > 0 && newVal < this.titleHeight) ? newVal - this.titleHeight : 0
+        if (this.fixedTop === fixedTop) return
         this.fixedTop = fixedTop
         this.$refs.fixed.style.transform = `translate3d(0, ${fixedTop}px, 0)`
       }
@@ -137,7 +153,7 @@
         this.touch.y2 = firstTouch.pageY
 
         // 向下取整
-        let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
+        let delta = (this.touch.y2 - this.touch.y1) / this.anchorHeight | 0
         // 获取移动的距离
         let anchorIndex = parseInt(this.touch.anchorIndex) + delta
         this._scrollTo(anchorIndex)
@@ -163,15 +179,21 @@
       // 计算每一个singer list的height
       calcHeight() {
         const list = this.$refs.listGroup
+        const length = list.length
         let height = 0
-        this.listHeight.push(height)
-        for (let i = 0; i < list.length; i++) {
+        let listHeight = []
+        listHeight.push(height)
+        for (let i = 0; i < length; i++) {
           let item = list[i]
           height += item.clientHeight
-          this.listHeight.push(height)
+          listHeight.push(height)
         }
+        this.listHeight = listHeight
       },
       selectItem(item) {
+        const style = this.$refs.scrollWrapper.style
+        style.transform = style.transform.replace('translateZ(0px)', '')
+        // this.$refs.scrollWrapper.style.transform = `translate(0, 0)`
         this.$emit('select', item)
       }
     }
@@ -183,7 +205,6 @@
     width: 100%
     height: 100%
     overflow: hidden
-    extend-styles(background, $color-background)
     .list-group
       padding-bottom: 30px
       .list-group-title
@@ -207,7 +228,7 @@
           font-size: $font-size-medium
     .list-shortcut
       position: absolute
-      z-index: 30
+      // z-index: 30
       right: 0
       top: 50%
       transform: translateY(-50%)

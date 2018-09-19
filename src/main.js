@@ -7,6 +7,7 @@ import App from './App'
 import router from './router'
 import VueLazyLoad from 'vue-lazyload'
 // import VConsole from 'vconsole'
+import testAudioPlay from 'common/js/audio'
 import './common/stylus/index.styl'
 import store from './store'
 import {mapGetters} from 'vuex'
@@ -26,6 +27,7 @@ Vue.use(VueLazyLoad, {
 Vue.config.productionTip = false
 fastclick.attach(document.body)
   /* eslint-disable no-new */
+setTimeout(testAudioPlay, 1000)
 new Vue({
   el: '#app',
   router,

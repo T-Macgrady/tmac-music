@@ -1,10 +1,10 @@
 <template>
   <div class="recommend" ref="recommend">
     <Scroll class="recommend-content" :data="discList" ref="scroll">
-      <div>
+      <div ref="scrollWrapper">
         <div class="slider">
           <div class="slider-wrapper" v-if="recommendList.length">
-            <slider>
+            <slider ref="slider">
               <!--slot-->
               <div v-for="item in recommendList" :key="item.key">
                 <a :href="item.linkUrl">
@@ -95,6 +95,14 @@
           path: `/recommend/${item.dissid}`
         })
         this.setDisc(item)
+        this.$nextTick(() => {
+          this.clearScrollStyle()
+        })
+      },
+      clearScrollStyle() {
+        this.$refs.slider.clearScrollStyle()
+        const style = this.$refs.scrollWrapper.style
+        style.transform = style.transform.replace('translateZ(0px)', '')
       },
       ...mapMutations({
         setDisc: 'SET_DISC'
@@ -105,7 +113,7 @@
 
 <style scoped lang="stylus">
   .recommend
-    position: fixed
+    position: absolute
     width: 100vw
     top: 88px
     bottom: 0

@@ -13,7 +13,7 @@
         ref="shortcut"
         :refreshDelay="refreshDelay"
       >
-        <div>
+        <div ref="scrollWrapper">
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
             <ul>
@@ -51,7 +51,7 @@
       <suggest 
         :query="query" 
         @listScroll="blurInput"
-        @select="saveSearch"
+        @select="select"
         ref="suggest"
       >
       </suggest>
@@ -132,6 +132,17 @@
             this.hotkey = res.data.hotkey.slice(0, 10)
           }
         })
+      },
+      select() {
+        this.$nextTick(() => {
+          this.saveSearch()
+          this.clearScrollStyle()
+        })
+      },
+      clearScrollStyle() {
+        this.$refs.suggest.clearScrollStyle()
+        const style = this.$refs.scrollWrapper.style
+        style.transform = style.transform.replace('translateZ(0px)', '')
       }
     }
   }
@@ -141,7 +152,7 @@
     .search-box-wrapper
       margin: 20px
     .shortcut-wrapper
-      position: fixed
+      position: absolute
       top: 178px
       bottom: 0
       width: 100%
@@ -179,7 +190,7 @@
                 font-size: $font-size-medium
                 color: $color-text-d
     .search-result
-      position: fixed
+      position: absolute
       width: 100%
       top: 178px
       bottom: 0

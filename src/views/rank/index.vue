@@ -1,7 +1,7 @@
 <template>
   <div class="rank" ref="rank">
     <scroll class="toplist" :data="topList" ref="topList">
-      <ul>
+      <ul ref="scrollWrapper">
         <li class="item" v-for="item in topList" :key="item.key" @click="jump(item)">
           <div class="icon">
             <img src="" alt="" width="100%" height="100%" v-lazy="item.picUrl">
@@ -64,6 +64,10 @@
           path: `/rank/${item.id}`
         })
         this.setTopList(item)
+        this.$nextTick(() => {
+          const style = this.$refs.scrollWrapper.style
+          style.transform = style.transform.replace('translateZ(0px)', '')
+        })
       },
       ...mapMutations({
         setTopList: 'SET_TOP_LIST'
@@ -72,8 +76,8 @@
   }
 </script>
 <style lang="stylus" scoped>
-   .rank
-    position: fixed
+  .rank
+    position: absolute
     width: 100%
     top: 88px
     bottom: 0

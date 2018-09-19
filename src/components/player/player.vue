@@ -1,166 +1,167 @@
 <template>
-  <transition name="appear">
-    <div class="player" v-show="playList.length > 0">
-      <transition name="normal"
-        @enter="enter"
-        @after-enter="afterEnter"
-        @leave="leave"
-        @after-leave="afterLeave"
-      >
-        <!--播放页面全屏-->
-        <div class="normal-player" :class="theme" v-show="fullScreen" ref="normalPlayer">
-          <!--背景 模糊-->
-          <div class="background">
-            <img :src="currentSong.image" alt="" width="100%" height="100%">
+  <div class="player" v-show="playList.length > 0">
+    <transition name="normal"
+      :duration="{ enter: 1600, leave: 400 }"
+    >
+      <!--播放页面全屏-->
+      <div class="normal-player" :class="theme" v-show="fullScreen" ref="normalPlayer">
+        <!--背景 模糊-->
+        <div class="background ignore">
+          <img :src="currentSong.image" class="bgImage" :class="theme" ref="background" alt="" width="100%" height="100%">
+        </div>
+        <!--顶部-->
+        <div class="top">
+          <div class="back" @click="back">
+            <i class="icon-back"></i>
           </div>
-          <!--顶部-->
-          <div class="top">
-            <div class="back" @click="back">
-              <i class="icon-back"></i>
-            </div>
-            <h1 class="title" v-html="currentSong.name"></h1>
-            <h2 class="subtitle" v-html="currentSong.singer"></h2>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
+        </div>
+        <!--底部按钮控制部分-->
+        <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active' : currentShow === 'cd'}"></span>
+            <span class="dot" :class="{'active' : currentShow === 'lyric'}"></span>
           </div>
-          <!--中间cd部分-->
-          <div class="middle" 
-            @touchstart.prevent="middleTouchStart"
-            @touchmove.prevent="middleTouchMove"
-            @touchend="middleTouchEnd"
-          >
-            <div class="middle-l" :style="opacityStyle">
-              <div class="cd-wrapper" :style="animateStyle" ref="cdWrapper">
-                <div class="cd" :class="cdCls">
-                  <img :src="currentSong.image" alt="" class="image">
-                </div>
-              </div>
-              <div class="text-wrapper">
-                <div class="text">
-                  <div class="playing-lyric">
-                    {{playingLyric}}
-                  </div>
-                  <p v-html="errorTip" v-if="audioError || manualPlay" class="errorTip">
-                  </p>
-                </div>
-              </div>
+          <div class="progress-wrapper">
+            <span class="time time-l">
+              {{format(currentTime)}}
+            </span>
+            <!--播放进度条-->
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" 
+                ref="progressBar" 
+                :audioError="audioError" 
+                :songReady="songReady"
+                :fullScreen="fullScreen" 
+                @percentChange="onProgressBarChange">
+              </progress-bar>
             </div>
-            <!--歌词滚动-->
-            <scroll class="middle-r" ref="lyriclist" :style="moveStyle" :data="currentLyric && currentLyric.lines">
-              <div class="lyric-wrapper">
-                <div v-if="currentLyric">
-                  <p ref="lyricLine" 
-                    class="text" 
-                    v-for="(line, index) in currentLyric.lines" 
-                    :key="line.key"
-                    :class="{'current': currentLineNum === index}"
-                  >
-                    {{line.txt}}
-                  </p>
-                </div>
-              </div>
-            </scroll>
+            <span class="time time-r">
+              {{format(currentSong.duration)}}
+            </span>
           </div>
-          <!--底部按钮控制部分-->
-          <div class="bottom">
-            <div class="dot-wrapper">
-              <span class="dot" :class="{'active' : currentShow === 'cd'}"></span>
-              <span class="dot" :class="{'active' : currentShow === 'lyric'}"></span>
+          <div class="operators">
+            <div class="icon i-left" @click="changeMode">
+              <i :class="iconMode"></i>
             </div>
-            <div class="progress-wrapper">
-              <span class="time time-l">
-                {{format(currentTime)}}
-              </span>
-              <!--播放进度条-->
-              <div class="progress-bar-wrapper">
-                <progress-bar :percent="percent" 
-                  ref="progressBar" 
-                  :audioError="audioError" 
-                  :songReady="songReady"
-                  :fullScreen="fullScreen" 
-                  @percentChange="onProgressBarChange">
-                </progress-bar>
-              </div>
-              <span class="time time-r">
-                {{format(currentSong.duration)}}
-              </span>
+            <div class="icon i-left" :class="disableCls">
+              <i class="icon-prev" @click="switchSong"></i>
             </div>
-            <div class="operators">
-              <div class="icon i-left" @click="changeMode">
-                <i :class="iconMode"></i>
+            <div class="icon i-center" :class="disableCenCls">
+              <i :class="playIcon" @click="togglePlaying"></i>
+            </div>
+            <div class="icon i-right" :class="disableCls">
+              <i class="icon-next" @click="switchSong"></i>
+            </div>
+            <div class="icon i-right">
+              <i 
+                @click="toggleFavorite(currentSong)" 
+                class="icon" 
+                :class="getFavoriteIcon(currentSong)"
+              >
+              </i>
+            </div>
+          </div>
+        </div>
+        <!--中间cd部分-->
+        <div class="middle" 
+          @touchstart="middleTouchStart"
+          @touchmove="middleTouchMove"
+          @touchend="middleTouchEnd"
+        >
+          <div class="middle-l" :style="opacityStyle">
+            <div class="cd-wrapper" ref="cdWrapper">
+              <div class="cd"
+                :class="cdCls"
+                @touchstart="bgTouchStart"
+                @touchend="bgTouchEnd"
+                @click="togglePlaying"
+              >
+                <div class="playBtn" v-show="!playing">
+                  <i class="icon-play"></i>
+                </div>
+                <img :src="currentSong.image" alt="" class="image ignore">
               </div>
-              <div class="icon i-left" :class="disableCls">
-                <i class="icon-prev" @click="switchSong"></i>
+            </div>
+            <div class="text-wrapper">
+              <div class="text">
+                <div class="playing-lyric">
+                  {{playingLyric}}
+                </div>
+                <p v-html="errorTip" v-if="audioError || manualPlay" class="errorTip">
+                </p>
               </div>
-              <div class="icon i-center" :class="disableCenCls">
-                <i :class="playIcon" @click="togglePlaying"></i>
-              </div>
-              <div class="icon i-right" :class="disableCls">
-                <i class="icon-next" @click="switchSong"></i>
-              </div>
-              <div class="icon i-right">
-                <i 
-                  @click="toggleFavorite(currentSong)" 
-                  class="icon" 
-                  :class="getFavoriteIcon(currentSong)"
+            </div>
+          </div>
+          <!--歌词滚动-->
+          <scroll class="middle-r" ref="lyriclist" :style="moveStyle" :data="currentLyric && currentLyric.lines">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p ref="lyricLine" 
+                  class="text" 
+                  v-for="(line, index) in currentLyric.lines" 
+                  :key="line.key"
+                  :class="{'current': currentLineNum === index}"
                 >
-                </i>
+                  {{line.txt}}
+                </p>
               </div>
             </div>
-          </div>
+          </scroll>
         </div>
-      </transition>
-      <!--播放页面小屏 底部-->
-      <transition name="mini">
-        <div class="mini-player" :class="theme" v-show="!fullScreen" @click="open">
-          <div class="icon">
-            <img alt="" :src="currentSong.image" :class="cdCls">
-          </div>
-          <div class="text">
-            <h2 class="name" v-html="currentSong.name"></h2>
-            <p class="desc" v-html="currentSong.singer"></p>
-          </div>
-          <div class="control">
-            <!--阻止冒泡-->
-            <progress-circle :radius="radius" :percent="percent">
-              <i @click.stop="togglePlaying" class="icon-mini" ref="iconMini" :class="miniIcon"></i>
-            </progress-circle>
-          </div>
-          <div class="control" @click.stop="showPlayList">
-            <i class="icon-playlist"></i>
-          </div>
+      </div>
+    </transition>
+    <!--播放页面小屏 底部-->
+    <transition name="mini">
+      <div class="mini-player ignore" :class="theme" v-show="!fullScreen" @click="open">
+        <div class="icon">
+          <img alt="" :src="currentSong.image" ref="img" :class="cdCls">
         </div>
-      </transition>
-      <play-list ref="playList"></play-list>
-      <audio ref="audio" 
-        @seeking="seeking" 
-        @playing="ready" 
-        @error="error"
-        @timeupdate="updateTime"
-        @ended="ended"
-      >
-      </audio>
-    </div>
-  </transition>
+        <div class="text">
+          <h2 class="name" v-html="currentSong.name"></h2>
+          <p class="desc" v-html="currentSong.singer"></p>
+        </div>
+        <div class="control">
+          <!--阻止冒泡-->
+          <progress-circle :percent="percent" :radius="radius">
+            <i @click.stop="togglePlaying" class="icon-mini" ref="iconMini" :class="miniIcon"></i>
+          </progress-circle>
+        </div>
+        <div class="control" @click.stop="showPlayList">
+          <i class="icon-playlist"></i>
+        </div>
+      </div>
+    </transition>
+    <play-list ref="playList"></play-list>
+    <audio ref="audio" 
+      id="audio"
+      @seeking="seeking" 
+      @playing="ready" 
+      @error="error"
+      @timeupdate="updateTime"
+      @ended="ended"
+    >
+    </audio>
+  </div>
 </template>
 <script>
   import { mapGetters, mapMutations, mapActions } from 'vuex'
   import ProgressBar from 'base/progressBar/progressBar'
   import ProgressCircle from 'base/progressCircle/progressCircle'
-  import { getAnimationEnd, getComputedStyle } from 'common/js/dom.js'
   import { debounce } from 'common/js/util'
   import { playMode } from 'common/js/config'
   import Lyric from 'common/js/lyric-parse'
   import Scroll from 'base/scroll'
   import PlayList from 'base/playList/playList'
-  import { playerMixin } from 'common/js/mixin'
+  import { playerMixin, setBgImgMixin } from 'common/js/mixin'
 
-  const animationend = getAnimationEnd()
   export default {
-    mixins: [playerMixin],
+    mixins: [playerMixin, setBgImgMixin],
     data() {
       return {
         songReady: false,
         currentTime: 0,
-        radius: 32,
         currentLyric: null,
         currentLineNum: 0,
         currentShow: 'cd',
@@ -168,14 +169,22 @@
         manualPlay: false,
         time: 0,
         opacity: 1,
-        offsetWidth: null,
+        offsetWidth: 0,
         cdAnim: {
           state: 'off',
           mode: 'in'
         },
         audioError: false,
         errorTip: '',
-        useDisCls: true
+        useDisCls: true,
+        bgOpacity: true,
+        client: {
+          width: window.innerWidth,
+          height: window.innerHeight
+        },
+        touch: {
+          initiated: false
+        }
       }
     },
     components: {
@@ -185,25 +194,33 @@
       PlayList
     },
     created() {
-      this.touch = {}
-      this.cdAnimStyle = document.querySelector('#cdanim')
-      this.cdAnimStyle.innerHTML = this.getKeyframes()
+      this.radius = 32
     },
     mounted() {
-      this.offsetN = 5
+      this.setCdAnimStyle()
+      // 切换横竖屏/resize时需reset项目
       window.addEventListener('resize', debounce(() => {
-        this.calcLyricPos()
+        // clientWidth/Height校准
+        this.client = {
+          width: window.innerWidth,
+          height: window.innerHeight
+        }
+        // cd&lyric位置校准
+        this.middleReset()
+        // cd动画位置校准
+        this.setCdAnimStyle()
       }, 200))
-      this.$nextTick(() => {
-        this.radius = parseFloat(parseFloat(getComputedStyle(this.$refs.iconMini, 'fontSize')).toFixed(2))
-      })
     },
     computed: {
       // 计算CD&歌词切换touchEnd后的动画样式
       moveStyle() {
-        return {
+        return this.touch.initiated
+        ? {
           transitionDuration: `${this.time}ms`,
           transform: `translate3d(${this.offsetWidth}px,0,0)`
+        } : {
+          transitionDuration: `${this.time}ms`,
+          transform: `translate(${this.offsetWidth}px,0)`
         }
       },
       opacityStyle() {
@@ -211,19 +228,6 @@
           transitionDuration: `${this.time}ms`,
           opacity: this.opacity
         } : {}
-      },
-
-      // 切换player全屏动画样式
-      animateStyle() {
-        return this.cdAnim.state === 'on'
-          ? (this.cdAnim.mode === 'in'
-            ? {
-              animation: `cd-animation 0.4s`
-            }
-            : {
-              animation: `cd-animation 0.4s reverse`
-            })
-          : {}
       },
 
       // 跟踪播放状态切换图标样式
@@ -248,6 +252,12 @@
       iconMode() {
         return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
       },
+      bgImage () {
+        return this.currentSong.image
+      },
+      offsetN() {
+        return Math.floor((437 / 667 * this.client.height) / (32 / 375 * this.client.width) / 2) - 1
+      },
       ...mapGetters([
         'fullScreen',
         'playing',
@@ -263,18 +273,22 @@
         this.resetFlag(newSong)
         // 获取并播放歌曲&歌词
         const audio = this.$refs.audio
-        audio.src = newSong.url
-        audio.play().catch(e => {
-          // uc浏览器无法自动播放处理
-          if (e.code === 0) {
-            this.manualPlay = true
-            // 相当于进入暂停状态,等待点击
-            this.songReady = true
-            this.setPlayingState(false)
+        audio.src = this.currentSong.url
+        try {
+          audio.play().catch(e => {
+            // uc浏览器等无法自动播放处理
+            if (e.code !== 9) {
+              this.manualPlay = true
+              // 相当于进入暂停状态,等待点击
+              this.songReady = true
+              this.setPlayingState(false)
 
-            this.errorTip = '该浏览器不支持自动播放,请点击按钮播放 ^-^'
-          }
-        })
+              this.errorTip = '该浏览器不支持自动播放,请点击按钮播放 ^-^'
+            }
+          })
+        } catch (e) {
+          console.log(e)
+        }
         this.getLyric()
       },
       // 歌曲播放/暂停
@@ -286,10 +300,11 @@
         })
       },
       fullScreen: function(newVal) {
-        newVal && setTimeout(() => {
-          this.$refs.lyriclist.refresh()
-          this.$refs.progressBar.setProgressOffset(this.percent)
-        }, 20)
+        if (newVal) {
+          setTimeout(() => {
+            this.$refs.progressBar.setProgressOffset(this.percent)
+          }, 20)
+        }
       }
     },
     methods: {
@@ -314,16 +329,27 @@
 
       // 已加载足够数据可开始播放，切换至play状态
       ready() {
+        // 测试音频返回
+        if (this.currentSong.id === undefined) return
+        // 不支持自动播放时模拟暂停状态，songReady应为false
         this.manualPlay && (this.songReady = false)
+
         if (this.songReady) {
+          // 保证音词同步
           this.lyricPlay()
         } else {
           this.handleFlag()
-          this.savePlayHistory(this.currentSong)
           this.endTime = this.currentSong.duration - 10
+          // 音量渐强
           this.$nextTick(() => {
             this.changeVolume('start')
+            this.$nextTick(() => {
+              this.savePlayHistory(this.currentSong)
+            })
           })
+          setTimeout(() => {
+            this.$refs.background.style.opacity = 1
+          }, 1000)
         }
       },
       handleFlag() {
@@ -332,9 +358,11 @@
         this.manualPlay && (this.manualPlay = false)
       },
       error(e) {
+        if (this.currentSong.id === undefined) return
         this.handleError()
       },
       seeking() {
+        if (this.currentSong.id === undefined) return
         this.currentLyric && this.currentLyric.stop()
       },
       handleError(e) {
@@ -348,7 +376,7 @@
           this.currentShow === 'lyric'
         }
         // 弹出error-tip
-        this.errorTip = '网络异常或播放源受限TnT,请切换歌曲'
+        this.errorTip = '网络异常或播放源受限TnT,请检查网络或切换歌曲'
       },
       changeVolume(type, delta = 0.2, floor = 0, limit = 1, time = 1) {
         const duration = time * 1000
@@ -382,9 +410,6 @@
         this.currentSong.getLyric().then(lyric => {
           this.currentLyric = new Lyric(lyric, this.handleLyric)
           this.setWatcher('songReady', 'lyricPlay')
-          this.$nextTick(() => {
-            this.calcLyricPos()
-          })
         }).catch(() => {
           this.clearLyric()
         })
@@ -420,10 +445,6 @@
         }
         this.playingLyric = txt
       },
-      calcLyricPos() {
-        if (!this.fullScreen) return
-        this.offsetN = Math.floor(this.$refs.lyriclist.$el.clientHeight / this.$refs.lyricLine[0].clientHeight / 2) - 1
-      },
       clearLyric() {
         if (this.currentLyric) {
           this.currentLyric.stop()
@@ -447,6 +468,7 @@
         this.currentLyric && this.currentLyric.seek(currentTime * 1000)
       },
       updateTime(e) {
+        if (this.currentSong.id === undefined) return
         this.currentTime = e.target.currentTime
         if (this.currentTime <= this.endTime || !this.musicEnd) return
         this.changeVolume('end', 0.2, 0.1)
@@ -482,14 +504,10 @@
           let len = this.playList.length
           if (e) {
             e.currentTarget.className === 'icon-prev' ? index-- : index++
+            this.$refs.background.style.opacity = 0.5
           } else {
             index++
           }
-          // if (index < 0) {
-          //   index = len - 1
-          // } else if (index > len - 1) {
-          //   index = 0
-          // }
           const remainder = index % len
           const currIndex = remainder >= 0 ? remainder : len - 1
           this.setCurrentIndex(currIndex)
@@ -497,6 +515,7 @@
         }
       },
       ended() {
+        if (this.currentSong.id === undefined) return
         if (this.mode === playMode.loop) {
           this.loop()
         } else {
@@ -550,6 +569,7 @@
         if (Math.abs(deltaY) > Math.abs(deltaX)) {
           return
         }
+        e.preventDefault()
         !this.touch.moved && (this.touch.moved = true)
         const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
         this.time = 0
@@ -584,62 +604,71 @@
         }
         this.touch.initiated = false
       },
+      middleReset() {
+        if (this.currentShow === 'cd') {
+          this.offsetWidth = 0
+          this.opacity = 1
+        } else {
+          this.offsetWidth = -window.innerWidth
+          this.opacity = 0
+        }
+      },
 
       // vue transition 动画钩子
-      enter(el, done) {
-        this.cdAnim.mode = 'in'
-        this.cdAnim.state = 'on'
-        this.$refs.cdWrapper.addEventListener(animationend, done, {once: true})
-      },
-      afterEnter() {
-        this.cdAnim.state = 'off'
-      },
-      leave(el, done) {
-        this.cdAnim.mode = 'out'
-        this.cdAnim.state = 'on'
-        this.$refs.cdWrapper.addEventListener(animationend, done, {once: true})
-      },
-      afterLeave() {
-        this.cdAnim.state = 'off'
-      },
+      // enter(el, done) {
+      //   this.cdAnim.mode = 'in'
+      //   this.cdAnim.state = 'on'
+      //   this.$refs.cdWrapper.addEventListener(animationend, done, {once: true})
+      // },
+      // afterEnter() {
+      //   this.cdAnim.state = 'off'
+      // },
+      // leave(el, done) {
+      //   this.cdAnim.mode = 'out'
+      //   this.cdAnim.state = 'on'
+      //   this.$refs.cdWrapper.addEventListener(animationend, done, {once: true})
+      // },
+      // afterLeave() {
+      //   this.cdAnim.state = 'off'
+      // },
 
       // 获取动画起始位置
       _getPosAndScale() {
+        const clientWidth = this.client.width
+        const clientHeight = this.client.height
         // 左下角小图片初始位置
-        const targetWidth = 40
-        const paddingLeft = 40
-        const paddingBottom = 30
+        const targetWidth = 40 / 375 * clientWidth
+        const paddingLeft = 20 / 375 * clientWidth
+        const paddingBottom = 10 / 375 * clientWidth
         // 中间大图片距离顶部位置
-        const paddingTop = 80
+        const paddingTop = 80 / 667 * clientHeight
         // 中间图片宽度
-        const width = window.innerWidth * 0.8
-        // 缩放尺度
+        const width = 300 / 667 * clientWidth
         const scale = targetWidth / width
-        const x = -(window.innerWidth / 2 - paddingLeft)
-        const y = window.innerHeight - paddingTop - width / 2 - paddingBottom
+        const x = -(clientWidth / 2 - paddingLeft)
+        const y = clientHeight - paddingTop - width / 2 - paddingBottom
         return {
           x,
           y,
           scale
         }
       },
-      getKeyframes() {
+      getKeyframes(start, end, name) {
         this.cdAnim = {...this.cdAnim, ...this._getPosAndScale()}
-        const pre = ['-webkit-', '-ms-', '-o-', '-moz-', '-khtml-', '']
+        const pre = ['-webkit-', '-ms-', '-o-', '-moz-', '']
         const ret = pre.map(item => {
-          return `@${item}keyframes cd-animation{
-            0%{
-              transform: translate3d(${this.cdAnim.x}px, ${this.cdAnim.y}px, 0) scale(${this.cdAnim.scale});
-            }
-            60%{
-              transform: translate3d(0, 0, 0) scale(1.25);
-            }
-            100%{
-              transform: translate3d(0, 0, 0) scale(1);
-            }
-          }\n`
+          return `@${item}keyframes ${name}{` +
+            `${start}{transform: translate3d(${this.cdAnim.x}px, ${this.cdAnim.y}px, 0) scale(${this.cdAnim.scale});}` +
+            `60%{transform: translate3d(0, 0, 0) scale(1.15);}` +
+            `${end}{transform: translate3d(0, 0, 0) scale(1);}` +
+          `}\n`
         })
         return ret.join('')
+      },
+      setCdAnimStyle() {
+        let innerHTML = this.getKeyframes('0%', '100%', 'cd-animation')
+        innerHTML += this.getKeyframes('100%', '0%', 'cd-animation-reverse')
+        document.querySelector('#cdanim').innerHTML = innerHTML
       },
       showPlayList() {
         this.$refs.playList.show()
@@ -648,15 +677,18 @@
         setFullScreen: 'SET_FULL_SCREEN'
       }),
       ...mapActions([
-        'savePlayHistory'
+        'savePlayHistory',
+        'setBgImgUrl'
       ])
     }
   }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
   .player
+    position: relative
+    z-index: 3
     &.appear-enter-active
-      transition: all 0.4s
+      transition: all .4s
     &.appear-enter
       opacity: 0
     .normal-player
@@ -665,17 +697,18 @@
       right: 0
       top: 0
       bottom: 0
-      z-index: 150
-      extend-styles(background, $color-background)
+      extend-styles(background, $color-background-op1)
       .background
         position: absolute
         left: 0
         top: 0
         width: 100%
         height: 100%
-        z-index: -1
-        opacity: 0.6
-        filter: blur(20px)
+        opacity: .5
+        .bgImage
+          transition: opacity 1s
+        &.ignore
+          filter: blur(15px)
       .top
         position: relative
         margin-bottom: calc(20 / 667 * 100vh)
@@ -683,7 +716,6 @@
           position absolute
           top: 0
           left: 6px
-          z-index: 50
           .icon-back
             display: block
             padding: 9px
@@ -704,7 +736,7 @@
           font-size: $font-size-medium
           color: $color-text
       .middle
-        position: fixed
+        position: absolute
         width: 100%
         top: calc(80 / 667 * 100vh)
         bottom: calc(150 / 667 * 100vh)
@@ -724,11 +756,24 @@
             width: @height
             .cd
               position: relative
+              z-index: 3
               width: 100%
               height: 100%
               box-sizing: border-box
-              border: 10px solid rgba(255, 255, 255, 0.1)
+              border: calc(44 / 667 * 100vh) solid rgb(22, 22, 22)
+              box-shadow: 0px 0px 0px 1.49925vh rgba(188,176,176,.09)
               border-radius: 50%
+              .playBtn
+                position: absolute
+                width: calc(50 / 667 * 100vh)
+                height: @width
+                left: 50%
+                top: 50%
+                transform: translate(-50%,-50%)
+                z-index: 1
+                .icon-play
+                  font-size: calc(50 / 667 * 100vh)
+                  color: rgba(255, 255, 255, .7)
               &.play
                 animation: rotate 20s linear infinite
               &.pause
@@ -740,6 +785,8 @@
                 width: 100%
                 height: 100%
                 border-radius: 50%
+                &.ignore
+                  box-shadow 0px 0px 10px 4px rgba(1, 1, 1, 0.89)
           .text-wrapper
             position: relative
             width: 100%
@@ -749,7 +796,7 @@
               position: absolute
               top: calc(50% - 25px)
               left: 10%
-              overflow: hidden
+              // overflow: hidden
               text-align: center
               .playing-lyric
                 height: 20px
@@ -763,15 +810,17 @@
                 color: #ec971f;
                 font-size: $font-size-medium;
         .middle-r
+          position: relative
+          z-index: 4
           display: inline-block
           vertical-align: top
           width: 100%
           height: 100%
           overflow: hidden
           .lyric-wrapper
+            position: relative
             width: 80%
             margin: 0 auto
-            overflow: hidden
             text-align: center
             .text
               line-height: 32px
@@ -837,74 +886,105 @@
             text-align: left
           .icon-favorite
             color: $color-sub-theme
-      &.normal-enter-active, &.normal-leave-active
-        transition: all 0.4s ease-in-out
-        .top, .bottom
-          transition: all 0.4s cubic-bezier(0.86, 0.18, 0.82, 1.32)
-      &.normal-enter, &.normal-leave-to
-        opacity: 0.3
+      &.normal-enter-active
+        transition: all .4s ease-out
+        .background
+          transition: all 1s .5s
+        .middle
+          .cd-wrapper
+            animation: cd-animation .4s
+        .top
+          transition: all .4s cubic-bezier(0.86, 0.18, 0.82, 1.32) 1.2s
+      &.normal-enter
+        opacity: .3
         .top
           transform: translate3d(0, -100px, 0)
-        .bottom
-          transform: translate3d(0, 100px, 0)
-    .mini-player
-      display: flex
-      align-items: center
-      position: fixed
-      left: 0
-      bottom: 0
-      z-index: 180
-      width: 100%
-      height: 60px
-      extend-styles(background, $color-highlight-background)
-      &.mini-enter-active, &.mini-leave-active
-        transition: all 0.4s
-      &.mini-enter, &.mini-leave-to
+        .background
+          opacity: .2
+      &.normal-leave-active
+        transition: all .35s ease-in
+        .middle
+          .cd-wrapper
+            animation: cd-animation-reverse .4s
+        // .top
+        //   transition: all .2s cubic-bezier(0.86, 0.18, 0.82, 1.32)
+      &.normal-leave-to
         opacity: 0
-      .icon
-        flex: 0 0 40px
-        width: 40px
-        padding: 0 10px 0 20px
-        img
-          width: 100%
-          height: 100%
-          border-radius: 50%
-          &.play
-            animation: rotate 10s linear infinite
-          &.pause
-            animation-play-state: paused
-      .text
+        // .top
+        //   transform: translate3d(0, -100px, 0)
+    .mini-player
+      &.ignore
         display: flex
-        flex-direction: column
-        justify-content: center
-        flex: 1
-        line-height: 20px
-        overflow: hidden
-        .name
-          margin-bottom: 2px
-          no-wrap()
-          font-size: $font-size-medium
-          color: $color-text
-        .desc
-          no-wrap()
-          font-size: $font-size-small
-          color: $color-text-d
-      .control
-        flex: 0 0 30px
-        width: 30px
-        padding: 0 10px
-        .icon-play-mini, .icon-pause-mini, .icon-playlist
-          font-size: 30px
-          color: $color-theme-d
-        .icon-mini
-          font-size: 30px
-          position: absolute
-          left: 0
-          top: 0
+        align-items: center
+        position: fixed
+        left: 0
+        bottom: 0
+        width: 100%
+        height: 60px
+        extend-styles(background, $color-background-d)
+        &.mini-enter-active, &.mini-leave-active
+          transition: all 0.4s
+        &.mini-enter, &.mini-leave-to
+          opacity: 0
+        .icon
+          flex: 0 0 40px
+          width: 40px
+          padding: 0 10px 0 20px
+          img
+            width: 100%
+            height: 100%
+            border-radius: 50%
+            position: relative
+            z-index: 2
+            &.play
+              animation: rotate 10s linear infinite
+            &.pause
+              animation-play-state: paused
+        .text
+          display: flex
+          flex-direction: column
+          justify-content: center
+          flex: 1
+          line-height: 20px
+          overflow: hidden
+          .name
+            margin-bottom: 2px
+            no-wrap()
+            font-size: $font-size-medium
+            color: $color-text
+          .desc
+            no-wrap()
+            font-size: $font-size-small
+            color: $color-text-d
+        .control
+          flex: 0 0 30px
+          width: 30px
+          padding: 0 10px
+          .icon-play-mini, .icon-pause-mini, .icon-playlist
+            font-size: 30px
+            color: $color-theme-d
+          .icon-mini
+            font-size: 30px
+            position: absolute
+            left: 1px
+            top: 3px
 
   @keyframes rotate
     0%
       transform: rotate(0)
     100%
       transform: rotate(360deg)
+  @keyframes bg-opacity
+    50%
+      opacity: .2
+    100%
+      opacity: 1
+
+  // @keyframes cd-animation
+  //   0%
+  //     transform: translate3d(-167.5px, 492.7px, 0) scale(0.237)
+  //   60%
+  //     transform: translate3d(0, 0, 0) scale(1.25)
+  //   100%
+  //     transform: translate3d(0, 0, 0) scale(1)
 </style>

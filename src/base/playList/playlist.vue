@@ -69,7 +69,7 @@
     data() {
       return {
         showFlag: false,
-        refreshDelay: 100
+        refreshDelay: 120
       }
     },
     components: {
@@ -157,7 +157,6 @@
     right: 0
     top: 0
     bottom: 0
-    z-index: 200
     extend-styles(background-color, $color-background-d)
     &.list-fade-enter-active, &.list-fade-leave-active
       transition: opacity .2s
@@ -173,7 +172,7 @@
       left: 0
       bottom: 0
       width: 100%
-      extend-styles(background, $color-highlight-background)
+      extend-styles(background, $color-highlight-background-op1)
       .list-header
         position: relative
         padding: 20px 30px 10px 20px
@@ -231,11 +230,11 @@
         width: 140px
         margin: 20px auto 30px auto
         .add
+          position: relative
+          z-index: 1
           display: flex
           align-items: center
           padding: 8px 16px
-          // border: 1px solid $color-text-l
-          // border-radius: 100px
           color: $color-text-l
           &.ignore.border::before
             border-color: $color-text-l

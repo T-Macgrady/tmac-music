@@ -12,6 +12,8 @@ export const SET_PLAY_MODE = 'SET_PLAY_MODE'
 
 export const SET_CURRENT_INDEX = 'SET_CURRENT_INDEX'
 
+export const SET_SONGS = 'SET_SONGS'
+
 export const SET_DISC = 'SET_DISC'
 
 export const SET_TOP_LIST = 'SET_TOP_LIST'
@@ -23,3 +25,9 @@ export const SET_PLAY_HISTORY = 'SET_PLAY_HISTORY'
 export const SET_FAVORITE_LIST = 'SET_FAVORITE_LIST'
 
 export const SET_THEME = 'SET_THEME'
+
+export const SET_BGIMG_URL = 'SET_BGIMG_URL'
+
+export const SET_OPACITY = 'SET_OPACITY'
+
+export const SET_TIPSHOW = 'SET_TIPSHOW'

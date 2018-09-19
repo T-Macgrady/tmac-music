@@ -16,6 +16,8 @@ export const currentSong = state => {
   return state.playList[state.currentIndex] || {}
 }
 
+export const songs = state => state.songs
+
 export const disc = state => state.disc
 
 export const topList = state => state.topList
@@ -27,3 +29,9 @@ export const playHistory = state => state.playHistory
 export const favoriteList = state => state.favoriteList
 
 export const theme = state => state.theme
+
+export const bgImgUrl = state => state.bgImgUrl
+
+export const opacity = state => state.opacity
+
+export const tipShow = state => state.tipShow

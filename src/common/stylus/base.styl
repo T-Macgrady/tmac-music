@@ -5,5 +5,36 @@ body, html
   font-family: 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback'
   user-select: none
   -webkit-tap-highlight-color: transparent
-  extend-styles(background, $color-background)
+  width: 100vw
+  height: 100vh
   color: $color-text
+
+.tip-icon
+    position: absolute
+    left: 25px
+    top: 5.5px
+    transform-origin: center
+    color: rgba(234, 234, 234, .75)
+    .icon-slide
+      font-size: 30px
+    .note
+      font-size: 8px
+    &.tip-enter-active
+      animation: scale 4s .5s
+    &.tip-leave-active
+      transition: all 1s
+    &.tip-leave-to
+      opacity: 0
+
+img
+  content: normal !important
+
+@keyframes scale
+  30%
+    transform: scale(1.5)
+  60%
+    transform: scale(1)
+  90%
+    transform: scale(1.5)
+  100%
+    transform: scale(1)

@@ -1,11 +1,24 @@
 <template>
   <div id="app">
+    <div class="bgColor" :class="theme">
+      <transition name="opacity">
+        <div v-show="bgOpacity" class="bgImg ignore" :class="theme" :style="bgImgStyle"></div>
+      </transition>
+    </div>
     <div 
+    class="header"
+    :class="theme"
     @touchstart="switchStart"
     @touchend="switchEnd"
     >
       <m-header></m-header>
       <tab></tab>
+      <transition name="tip">
+        <div v-show="tipIcon" ref="tipIcon" class="tip-icon">
+          <i class="icon-slide"></i>
+          <p class="note">滑动换肤</p>
+        </div>
+      </transition>
     </div>
     <keep-alive>
       <router-view></router-view>
@@ -19,13 +32,18 @@
   import MHeader from 'components/mHeader/mHeader'
   import Tab from 'components/tab'
   import Player from 'components/player/player'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapGetters } from 'vuex'
+  import { getAnimationEnd } from 'common/js/dom'
+
+const animationend = getAnimationEnd()
   export default {
     name: 'app',
     data() {
       return {
         themes: ['black', 'blue', 'red', 'green'],
-        index: 0
+        index: 0,
+        bgOpacity: false,
+        tipIcon: false
       }
     },
     computed: {
@@ -34,7 +52,13 @@
         let index = this.index
         index = (index >= 0 && index <= 3) ? index : 0
         return this.themes[index]
-      }
+      },
+      bgImgStyle() {
+        return {
+          backgroundImage: `url(${this.bgImgUrl})`
+        }
+      },
+      ...mapGetters(['bgImgUrl'])
     },
     created() {
       // 根据localstorage初始化i
@@ -47,13 +71,19 @@
           break
         }
       }
-
       this.touch = {}
-      // 根据vuex初始化body皮肤样式class
-      this.body = this.$root.$el.parentElement
-      this.setClass(this.body, this.currentTheme)
-      // 监听自定义的换肤事件，在moveend判断是否触发
-      this.$on('switch', this.switchTheme.bind(this))
+    },
+    mounted() {
+      this.bgOpacity = true
+      setTimeout(() => {
+        this.tipIcon = true
+        this.$refs.tipIcon.addEventListener(animationend, () => {
+          this.tipIcon && (this.tipIcon = false)
+        }, {once: true})
+        setTimeout(() => {
+          this.tipIcon && (this.tipIcon = false)
+        }, 4500)
+      }, 1000)
     },
     methods: {
       switchStart(e) {
@@ -78,24 +108,10 @@
         let index = this.index
         const len = this.themes.length
         deltaX > 0 ? index++ : index--
-        // if (index > len - 1) {
-        //   this.index = 0
-        // } else if (index < 0) {
-        //   this.index = len - 1
-        // } else {
-        //   this.index = index
-        // }
         this.index = index % len >= 0 ? index % len : (len - 1)
         // 触发换肤事件并去除int/move标记
-        this.$emit('switch', this.currentTheme)
+        this.setTheme(this.currentTheme)
         this.touch.initiated = false
-      },
-      switchTheme(theme) {
-        this.setClass(this.body, theme)
-        this.setTheme(theme)
-      },
-      setClass(el, classNmae) {
-        el.className = classNmae
       },
       ...mapActions(['setTheme'])
     },
@@ -107,12 +123,53 @@
   }
 </script>
 
-<style scoped lang="stylus">
+<style lang="stylus" scoped>
   #app
     overflow: hidden
-  img
-    width: 100%
-    height: auto
-    vertical-align: top
-    content: normal !important
+    .bgColor
+      position: absolute
+      z-index: -1
+      overflow: hidden
+      left: 0
+      top: 0
+      width: 100%
+      height: 100vh
+      extend-styles(background, $color-background-op1)
+      .bgImg::after
+        position: absolute
+        left: 0
+        right: 0
+        content: " "
+        width: 100%
+        height: 100%
+      .bgImg
+        position: absolute
+        left: 0
+        top: 0
+        width: 100%
+        height: 100%
+        background-repeat: no-repeat
+        background-size: cover
+        background-position: center
+        opacity: .6
+        transform-origin: center
+        transform: scale(1.5)
+        extend-styles-pseudo(background-color, $color-background-d, after)
+        &.ignore
+          filter: blur(15px)
+        &.opacity-enter-active
+          animation: opacity 2.5s
+    .header
+      extend-styles(background, $color-background-d)
+
+  @keyframes opacity
+    20%
+      opacity: .6
+      transform: scale(1.5)
+    60%
+      transform: scale(3)
+      opacity: 1
+    100%
+      opacity: .6
+      transform: scale(1.5)
 </style>

@@ -11,6 +11,8 @@ const FAVORITE_MAX_LEN = 200
 
 const THEME_KEY = '__THEME__'
 
+const BGIMG_URL_KEY = '__BGIMGURL__'
+
 function insertArray(arr, val, compare, maxLen) {
   const index = arr.findIndex(compare)
   if (index === 0) {
@@ -102,3 +104,14 @@ export function saveTheme(theme) {
 export function loadTheme() {
   return storage.get(THEME_KEY, 'black')
 }
+
+export function saveBgImgUrl(bgImgUrl) {
+  storage.set(BGIMG_URL_KEY, bgImgUrl)
+  return bgImgUrl
+}
+
+export function loadBgImgUrl() {
+  return storage.get(BGIMG_URL_KEY, defaultBgImgUrl)
+}
+
+const defaultBgImgUrl = 'http://p.qpic.cn/music_cover/PJrGzQib7nia43112ibFrSia1MW0CpubJPWLYpia6nSzMVByVSXmn542GCw/600?n=1'

@@ -1,6 +1,6 @@
 <template>
-  <div class="search-box" :class="theme" >
-    <i class="icon-search" :class="theme"></i>
+  <div class="search-box" :class="theme">
+    <i class="icon-search"></i>
     <input ref="query" v-model="query" class="box" :class="theme" :placeholder="placeholder"/>
     <i @click="clear" v-show="query" class="icon-dismiss" :class="theme"></i>
   </div>
@@ -57,7 +57,8 @@
       flex: 1
       margin: 0 5px
       line-height: 18px
-      extend-styles(background, $color-highlight-background)
+      // extend-styles(background, $color-highlight-background)
+      background: transparent
       color: $color-text
       font-size: $font-size-medium
       &::placeholder
