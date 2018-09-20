@@ -131,6 +131,7 @@
         this.scrollY = pos.y
       },
       back() {
+        this.clearTipIcon()
         this.$router.push(this.$router.history.current.matched[0].path)
       },
       selectItem(item, index) {

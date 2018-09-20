@@ -88,7 +88,6 @@ const animationend = getAnimationEnd()
     methods: {
       switchStart(e) {
         this.touch.initiated = true
-
         const touch = e.touches[0]
         this.touch.startX = touch.screenX
         this.touch.startY = touch.screenY
