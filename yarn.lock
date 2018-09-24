@@ -7096,6 +7096,10 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
+vue-elehover@^2.0.0:
+  version "2.0.0"
+  resolved "http://registry.npm.taobao.org/vue-elehover/download/vue-elehover-2.0.0.tgz#a51c2dce48caf15a76851668782132005ed06329"
+
 vue-hot-reload-api@^2.1.0:
   version "2.3.0"
   resolved "http://registry.npm.taobao.org/vue-hot-reload-api/download/vue-hot-reload-api-2.3.0.tgz#97976142405d13d8efae154749e88c4e358cf926"

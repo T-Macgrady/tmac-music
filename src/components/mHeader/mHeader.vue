@@ -1,7 +1,9 @@
 <template>
   <div class="m-header">
-    <div class="icon" @touchstart.prevent></div>
-    <h1 class="text">Tmac Music</h1>
+    <a href="http://47.106.183.192/" target="_blank">
+      <div class="icon" @touchstart.prevent></div>
+      <h1 class="text">Tmac Music</h1>
+    </a>
     <router-link tag="div" class="mine" to="/user">
       <i class="icon-mine"></i>
     </router-link>

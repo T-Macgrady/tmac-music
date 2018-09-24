@@ -16,7 +16,11 @@
 </template>
 
 <script>
-  export default {}
+  export default {
+    mounted() {
+      this.$clickRipple('tab-item')
+    }
+  }
 </script>
 
 <style scoped lang="stylus">

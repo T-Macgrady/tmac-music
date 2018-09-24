@@ -11,7 +11,9 @@ import testAudioPlay from 'common/js/audio'
 import './common/stylus/index.styl'
 import store from './store'
 import {mapGetters} from 'vuex'
+import clickRipples from 'vue-click-ripples'
 
+Vue.use(clickRipples)
 // if (process.env.NODE_ENV !== 'production') {
 //   const vConsole = new VConsole()
 //   console.log(vConsole.version)

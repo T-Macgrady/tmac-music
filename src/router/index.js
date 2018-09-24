@@ -106,10 +106,10 @@ let router = new Router({
 
 router.beforeEach((to, from, next) => {
   if (to.name === undefined) {
-    const delay = to.path === '/user' ? 50 : 200
+    // const delay = to.path === '/user' ? 50 : 200
     setTimeout(() => {
       document.querySelector('.bgColor').style.zIndex = '1'
-    }, delay)
+    }, 50)
   }
   next()
   // if (from.path === '/' && to.params.id !== undefined) {

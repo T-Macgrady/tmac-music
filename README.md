@@ -2,7 +2,7 @@
 
 ## 项目说明：
 
-- 项目来源于imooc，本着加深对Vue理解的目的，基于Vue全家桶从脚手架搭建到项目部署上线，打造一个媲美原生体验的完整的移动端音乐Web App项目！
+- 项目来源于imooc，本着加深对Vue理解的目的，基于Vue全家桶从脚手架搭建到项目部署上线，打造一个媲美原生体验的功能完善、多屏适配的响应式移动端音乐项目！
 
 <a id="demo"></a> 
 ### 项目预览:
@@ -14,14 +14,68 @@
 
 - 图片演示：
 
-![singer](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/singer.jpg)![player](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/player.jpg)
+ -  推荐页  / 歌手页 
 
-## 更新记录
+<img src="https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/recommend.png" width="365" height="619"/> <img src="https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/singer1.png" width="365" height="619"/>
+
+
+ -  播放器页  / 歌手详情页 
+
+<img src="https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/player.png" width="365" height="619"/> <img src="https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/singerdt.png" width="365" height="619"/>
+
+
+ - 播放列表页  /  用户中心页 
+
+<img src="https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/rank.png" width="365" height="619"/> <img src="https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/fav.png" width="365" height="619"/>
+
+
+## Update
 
 - 使用viewport单位方案实现移动端适配
 - 利用postcss工具，处理浏览器兼容以及1px边框等常见移动端问题，可专注于业务逻辑开发，加快开发速度
+```javascript
+module.exports = {
+  "plugins": {
+    "postcss-aspect-ratio-mini": {}, 
+      "postcss-write-svg": {
+        utf8: false
+      },
+      "postcss-cssnext": {},
+      "postcss-px-to-viewport": {
+        viewportWidth: 375,     // (Number) The width of the viewport.
+        viewportHeight: 667,    // (Number) The height of the viewport.
+        unitPrecision: 3,       // (Number) The decimal numbers to allow the REM units to grow to.
+        viewportUnit: 'vw',     // (String) Expected units.
+        selectorBlackList: ['.ignore', '.hairlines'],  // (Array) The selectors to ignore and leave as px.
+        minPixelValue: 1,       // (Number) Set the minimum pixel value to replace.
+        mediaQuery: false       // (Boolean) Allow px to be converted in media queries.
+      }, 
+      "postcss-viewport-units":{},
+      "cssnano": {
+        preset: "advanced",
+        autoprefixer: false,
+        "postcss-zindex": false
+      },
+  }
+}
+```
 - Vuex + Stylus + localstorage实现颜色及图片背景换肤功能
+ - stylus函数设置各皮肤样式
+ - vuex定义各组件切换皮肤相应class的全局变量
+ - 利用Vue.minx全局混入vuex全局变量
+ - App.vue组件控制皮肤切换功能
+ - 监控touch事件，水平滑动超过半屏则触发换肤事件
+ - 用户当前选择皮肤保存在localstorage
 - bug fixed : 部分不支持auto play、播放源受限、快速切歌歌词异常、词曲不同步等
+ - fix(player): fix部分浏览器不支持auto play
+   使用空音频测试是否支持自动播放，不支持则监听document点击事件播放或者进入播放界面后切换成暂停状态提示用户点击
+ - fix(player): fix music api
+   qq音乐对audio播放源限制，需vkey验证，添加获取vkey的api
+ - fix(player): fix播放bug
+   修正后播放源受限/网络错误时，清除歌词，进度条不可拖动，给出tip
+   针对快速切换歌曲添加timer
+
+## 技术栈
 
 ### 技术
 

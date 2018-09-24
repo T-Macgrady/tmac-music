@@ -65,7 +65,7 @@
   .slide-enter-active
     transition: all .2s
   .slide-leave-active
-    transition: all .1s
+    transition: all .2s
   .slide-enter
     transform: translate3d(100%, 0, 0)
   .slide-leave-to
