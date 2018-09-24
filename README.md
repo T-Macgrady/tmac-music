@@ -16,7 +16,12 @@
 
 ![singer](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/singer.jpg)![player](https://raw.githubusercontent.com/T-Macgrady/imgs/master/tmacmusic/player.jpg)
 
-## 技术栈
+## 更新记录
+
+- 使用viewport单位方案实现移动端适配
+- 利用postcss工具，处理浏览器兼容以及1px边框等常见移动端问题，可专注于业务逻辑开发，加快开发速度
+- Vuex + Stylus + localstorage实现颜色及图片背景换肤功能
+- bug fixed : 部分不支持auto play、播放源受限、快速切歌歌词异常、词曲不同步等
 
 ### 技术
 
