@@ -3,6 +3,7 @@
 ## 项目说明：
 
 - 项目来源于imooc，本着加深对Vue理解的目的，基于Vue全家桶从脚手架搭建到项目部署上线，打造一个媲美原生体验的功能完善、多屏适配的响应式移动端音乐项目！
+- 使用qq音乐的播放源，由于其限制越来越严格，播放源经常变更或加验证导致部分无法播放，会随之修复
 
 <a id="demo"></a> 
 ### 项目预览:
@@ -59,21 +60,21 @@ module.exports = {
   }
 }
 ```
-- Vuex + Stylus + localstorage实现颜色及图片背景换肤功能
- - stylus函数设置各皮肤样式
- - vuex定义各组件切换皮肤相应class的全局变量
- - 利用Vue.minx全局混入vuex全局变量
- - App.vue组件控制皮肤切换功能
- - 监控touch事件，水平滑动超过半屏则触发换肤事件
- - 用户当前选择皮肤保存在localstorage
-- bug fixed : 部分不支持auto play、播放源受限、快速切歌歌词异常、词曲不同步等
- - fix(player): fix部分浏览器不支持auto play
-   使用空音频测试是否支持自动播放，不支持则监听document点击事件播放或者进入播放界面后切换成暂停状态提示用户点击
- - fix(player): fix music api
-   qq音乐对audio播放源限制，需vkey验证，添加获取vkey的api
- - fix(player): fix播放bug
-   修正后播放源受限/网络错误时，清除歌词，进度条不可拖动，给出tip
-   针对快速切换歌曲添加timer
+* Vuex + Stylus + localstorage实现颜色及图片背景换肤功能
+  * stylus函数设置各皮肤样式
+  * vuex定义各组件切换皮肤相应class的全局变量
+  * 利用Vue.minx全局混入vuex全局变量
+  * App.vue组件控制皮肤切换功能
+  * 监控touch事件，水平滑动超过半屏则触发换肤事件
+  * 用户当前选择皮肤保存在localstorage
+* bug fixed : 部分不支持auto play、播放源受限、快速切歌歌词异常、词曲不同步等
+  * fix(player): fix部分浏览器不支持auto play
+    使用空音频测试是否支持自动播放，不支持则监听document点击事件播放或者进入播放界面后切换成暂停状态提示用户点击
+  * fix(player): fix music api
+    qq音乐对audio播放源限制，需vkey验证，添加获取vkey的api
+  * fix(player): fix播放bug
+    修正后播放源受限/网络错误时，清除歌词，进度条不可拖动，给出tip
+    针对快速切换歌曲添加timer
 
 ## 技术栈
 
