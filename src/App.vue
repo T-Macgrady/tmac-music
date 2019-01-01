@@ -150,12 +150,12 @@ const animationend = getAnimationEnd()
         background-repeat: no-repeat
         background-size: cover
         background-position: center
-        opacity: .6
+        // opacity: .6
         transform-origin: center
-        transform: scale(1.5)
+        // transform: scale(1.5)
         extend-styles-pseudo(background-color, $color-background-d, after)
         &.ignore
-          filter: blur(15px)
+          // filter: blur(15px)
         &.opacity-enter-active
           animation: opacity 2.5s
     .header
@@ -163,12 +163,12 @@ const animationend = getAnimationEnd()
 
   @keyframes opacity
     20%
-      opacity: .6
+      // opacity: .6
       transform: scale(1.5)
     60%
       transform: scale(3)
       opacity: 1
     100%
-      opacity: .6
+      // opacity: .6
       transform: scale(1.5)
 </style>

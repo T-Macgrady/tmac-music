@@ -114,4 +114,4 @@ export function loadBgImgUrl() {
   return storage.get(BGIMG_URL_KEY, defaultBgImgUrl)
 }
 
-const defaultBgImgUrl = 'http://p.qpic.cn/music_cover/PJrGzQib7nia43112ibFrSia1MW0CpubJPWLYpia6nSzMVByVSXmn542GCw/600?n=1'
+const defaultBgImgUrl = 'https://raw.githubusercontent.com/T-Macgrady/imgs/master/love/love.png'
