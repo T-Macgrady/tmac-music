@@ -47,7 +47,7 @@ const animationend = getAnimationEnd()
       }
     },
     computed: {
-      // 下一个皮肤样式class
+      // 下一个皮肤样式
       currentTheme() {
         let index = this.index
         index = (index >= 0 && index <= 3) ? index : 0
