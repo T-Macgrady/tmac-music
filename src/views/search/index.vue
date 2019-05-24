@@ -52,6 +52,7 @@
         :query="query" 
         @listScroll="blurInput"
         @select="select"
+        :selectFirst="selectFirst" 
         ref="suggest"
       >
       </suggest>
@@ -107,6 +108,14 @@
     },
     created() {
       this._getHotKey()
+    },
+    mounted() {
+      const { key } = this.$route.query
+
+      setTimeout(() => {
+        this.query = key
+        this.selectFirst = true
+      }, 1000)
     },
     methods: {
       ...mapActions([

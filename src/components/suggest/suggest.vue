@@ -55,6 +55,10 @@
       showSinger: {
         type: Boolean,
         default: true
+      },
+      selectFirst: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
@@ -71,6 +75,13 @@
     watch: {
       query() {
         this.search()
+      },
+      selectFirst(newVal) {
+        if (newVal) {
+          setTimeout(() => {
+            this.selectItem(this.result[0])
+          }, 1000)
+        }
       },
       songs(newSongs) {
         // newSongs.zhida && newSongs.unshift(newSongs.zhida)
