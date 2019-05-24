@@ -76,19 +76,18 @@
       query() {
         this.search()
       },
-      selectFirst(newVal) {
-        if (newVal) {
-          setTimeout(() => {
-            this.selectItem(this.result[0])
-          }, 1000)
-        }
-      },
       songs(newSongs) {
         // newSongs.zhida && newSongs.unshift(newSongs.zhida)
         // this.result = [...this.result, ...newSongs]
         this.result = newSongs.zhida === undefined
           ? [...this.result, ...newSongs]
           : [...this.result, newSongs.zhida, ...newSongs]
+
+        if (this.selectFirst) {
+          setTimeout(() => {
+            this.selectItem(this.result[0])
+          }, 1000)
+        }
       }
     },
     methods: {

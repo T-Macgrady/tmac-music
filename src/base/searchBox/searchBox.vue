@@ -14,11 +14,22 @@
       placeholder: {
         type: String,
         default: '搜索歌曲、歌手'
+      },
+      newQuery: {
+        type: String,
+        default: ''
       }
     },
     data() {
       return {
         query: ''
+      }
+    },
+    watch: {
+      newQuery(newQuery) {
+        if (newQuery) {
+          this.query = newQuery
+        }
       }
     },
     methods: {

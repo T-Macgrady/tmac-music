@@ -4,7 +4,7 @@
       <!--searchBox query变化时派发query事件 search component监听该事件获取query值-->
       <!--search component将该值传递给suggest component-->
       <!--suggest component 监听到query值的变化调用search函数-->
-      <search-box ref="searchBox" @query="onQueryChange"></search-box>
+      <search-box ref="searchBox" :newQuery="newQuery" @query="onQueryChange"></search-box>
     </div>
     <div class="shortcut-wrapper" v-show="!query" ref="shortcutWrapper">
       <scroll 
@@ -89,7 +89,9 @@
     data() {
       return {
         hotkey: [],
-        refreshDelay: 100
+        refreshDelay: 100,
+        newQuery: '',
+        selectFirst: false
       }
     },
     computed: {
@@ -114,6 +116,7 @@
 
       setTimeout(() => {
         this.query = key
+        this.newQuery = key
         this.selectFirst = true
       }, 1000)
     },
