@@ -62,6 +62,9 @@
               >
               </i>
             </div>
+            <div class="icon" @click="showControl">
+              <img src="../../common/image/download.png" class="download">
+            </div>
           </div>
         </div>
         <!--中间cd部分-->
@@ -92,6 +95,17 @@
                 <p v-html="errorTip" v-if="audioError || manualPlay" class="errorTip">
                 </p>
               </div>
+              <audio ref="audio" 
+                v-show="audioVisible"
+                controls
+                id="audio"
+                @seeking="seeking" 
+                @playing="ready" 
+                @error="error"
+                @timeupdate="updateTime"
+                @ended="ended"
+              >
+              </audio>
             </div>
           </div>
           <!--歌词滚动-->
@@ -134,15 +148,6 @@
       </div>
     </transition>
     <play-list ref="playList"></play-list>
-    <audio ref="audio" 
-      id="audio"
-      @seeking="seeking" 
-      @playing="ready" 
-      @error="error"
-      @timeupdate="updateTime"
-      @ended="ended"
-    >
-    </audio>
   </div>
 </template>
 <script>
@@ -184,7 +189,8 @@
         },
         touch: {
           initiated: false
-        }
+        },
+        audioVisible: false
       }
     },
     components: {
@@ -673,6 +679,9 @@
       showPlayList() {
         this.$refs.playList.show()
       },
+      showControl() {
+        this.audioVisible = true
+      },
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN'
       }),
@@ -789,14 +798,15 @@
                   box-shadow 0px 0px 10px 4px rgba(1, 1, 1, 0.89)
           .text-wrapper
             position: relative
+            display: flex
+            flex-direction: column;
+            align-items: center
+            justify-content: space-around;
             width: 100%
             height: calc(137 / 667 * 100vh)
             .text
               width: 80%
-              position: absolute
               top: calc(50% - 25px)
-              left: 10%
-              // overflow: hidden
               text-align: center
               .playing-lyric
                 height: 20px
@@ -886,6 +896,9 @@
             text-align: left
           .icon-favorite
             color: $color-sub-theme
+          .download
+            width: 30px
+            height: 30px
       &.normal-enter-active
         transition: all .4s ease-out
         .background
