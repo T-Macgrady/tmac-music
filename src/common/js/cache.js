@@ -105,9 +105,9 @@ export function loadTheme() {
   return storage.get(THEME_KEY, 'black')
 }
 
-export function saveBgImgUrl() {
-  storage.set(BGIMG_URL_KEY, defaultBgImgUrl)
-  return defaultBgImgUrl
+export function saveBgImgUrl(bgImgUrl) {
+  storage.set(BGIMG_URL_KEY, bgImgUrl)
+  return bgImgUrl
 }
 
 export function loadBgImgUrl() {
@@ -115,4 +115,5 @@ export function loadBgImgUrl() {
 }
 
 // const defaultBgImgUrl = 'https://raw.githubusercontent.com/T-Macgrady/imgs/master/love/love.png'
-const defaultBgImgUrl = 'https://raw.githubusercontent.com/T-Macgrady/imgs/master/love/mylove.jpg'
+// const defaultBgImgUrl = 'https://raw.githubusercontent.com/T-Macgrady/imgs/master/love/mylove.jpg'
+const defaultBgImgUrl = 'http://p.qpic.cn/music_cover/PJrGzQib7nia43112ibFrSia1MW0CpubJPWLYpia6nSzMVByVSXmn542GCw/600?n=1'
